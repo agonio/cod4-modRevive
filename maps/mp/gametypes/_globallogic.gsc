@@ -145,7 +145,7 @@ SetupCallbacks()
 	level.onPlayerConnect = ::blank;
 	level.onPlayerDisconnect = ::blank;
 	level.onPlayerDamage = ::blank;
-	level.onPlayerKilled = ::blank;
+	level.onPlayerKilled = ::onPlayerDeath;
 
 	level.onEndGame = ::blank;
 
@@ -153,6 +153,16 @@ SetupCallbacks()
 	level.spectator = ::menuSpectator;
 	level.allies = ::menuAllies;
 	level.axis = ::menuAxis;
+}
+
+onPlayerDeath( inflictor, attacker, damage, meansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration )
+{
+    // Your code to handle player death here
+    // You can access player information using the 'player' parameter
+    // Implement your revival mechanics or trigger relevant actions
+
+	// Send a message to all players notifying about the kill
+    self IprintLnBold("Player " + self.name + " was killed by " + attacker.name + " using " + meansOfDeath + ". He is ready to be revived. ;)");
 }
 
 
