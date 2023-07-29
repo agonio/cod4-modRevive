@@ -162,7 +162,18 @@ onPlayerDeath( inflictor, attacker, damage, meansOfDeath, sWeapon, vDir, sHitLoc
     // Implement your revival mechanics or trigger relevant actions
 
 	// Send a message to all players notifying about the kill
-    self IprintLnBold("Player " + self.name + " was killed by " + attacker.name + " using " + meansOfDeath + ". He is ready to be revived. ;)");
+	players = getEntArray("player", "classname");
+	
+	for(i = 0; i < players.size; i++)
+	{
+		thread printInfo(players[i], self.name, attacker.name, meansOfDeath );
+	}
+     
+}
+
+printInfo(pl, name1, name2, cause)
+{
+	pl IprintLnBold("Player " + name1 + " was killed by " + name2 + " using " + cause + ".\n He is ready to be revived. ;)");
 }
 
 
