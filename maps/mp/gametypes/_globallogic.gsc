@@ -145,7 +145,7 @@ SetupCallbacks()
 	level.onPlayerConnect = ::blank;
 	level.onPlayerDisconnect = ::blank;
 	level.onPlayerDamage = ::blank;
-	level.onPlayerKilled = ::onPlayerDeath;
+	level.onPlayerKilled = ::blank;
 
 	level.onEndGame = ::blank;
 
@@ -154,28 +154,6 @@ SetupCallbacks()
 	level.allies = ::menuAllies;
 	level.axis = ::menuAxis;
 }
-
-onPlayerDeath( inflictor, attacker, damage, meansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration )
-{
-    // Your code to handle player death here
-    // You can access player information using the 'player' parameter
-    // Implement your revival mechanics or trigger relevant actions
-
-	// Send a message to all players notifying about the kill
-	players = getEntArray("player", "classname");
-	
-	for(i = 0; i < players.size; i++)
-	{
-		thread printInfo(players[i], self.name, attacker.name, meansOfDeath );
-	}
-     
-}
-
-printInfo(pl, name1, name2, cause)
-{
-	pl IprintLnBold("Player " + name1 + " was killed by " + name2 + " using " + cause + ".\n He is ready to be revived. ;)");
-}
-
 
 // to be used with things that are slow.
 // unfortunately, it can only be used with things that aren't time critical.
