@@ -3,6 +3,7 @@ del mod.ff
 
 xcopy ui_mp ..\..\raw\ui_mp /SY
 xcopy maps ..\..\raw\maps /SY
+xcopy xModel ..\..\raw\xModel /SY
 
 copy /Y mod.csv ..\..\zone_source
 cd ..\..\bin
@@ -11,5 +12,6 @@ cd ..\mods\ModRevive
 copy ..\..\zone\english\mod.ff
 7za a -r -tzip z_modrevive.iwd maps
 7za a -r -tzip z_modrevive.iwd images
+7za a -r -tzip z_modrevive.iwd xModel
 
 pause
