@@ -65,6 +65,10 @@ checkRevive(attacker, sMeansOfDeath)
 		deadPlayer.resBox = resBox;
 		level.deadPlayers[team][self.name] = deadPlayer;
 		self IprintLnBold("deadPlayers: " + level.deadPlayers[team].size);
+
+        wait 0.5;
+        self spawn(self.origin, self.angles);
+        self IprintLnBold("after spawn");
 	}
 }
 
