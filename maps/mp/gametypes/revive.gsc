@@ -67,7 +67,8 @@ checkRevive(attacker, sMeansOfDeath)
 		self IprintLnBold("deadPlayers: " + level.deadPlayers[team].size);
 
         wait 0.5;
-        self spawn(self.origin, self.angles);
+        self maps\mp\gametypes\_gameobjects::spawnPlayer();
+        self.origin = deadPlayer.location;
         self IprintLnBold("after spawn");
 	}
 }
