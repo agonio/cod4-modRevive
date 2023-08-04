@@ -2,6 +2,12 @@ init()
 {
 	level.deadPlayers["axis"] = [];
 	level.deadPlayers["allies"] = [];
+
+    // rm after debug ***
+    setDvar("scr_game_matchstarttime", 0);
+    
+    setDvar("scr_game_playerwaittime", 0);
+    // ***
 }
 
 onPrecacheGameType()
@@ -57,7 +63,7 @@ checkRevive(attacker, sMeansOfDeath)
 		resBox.useWeapon = "briefcase_bomb_mp";
 
 		deadPlayer.resBox = resBox;
-		level.deadPlayers[team][level.deadPlayers[team].size] = deadPlayer;
+		level.deadPlayers[team][self.name] = deadPlayer;
 		self IprintLnBold("deadPlayers: " + level.deadPlayers[team].size);
 	}
 }
