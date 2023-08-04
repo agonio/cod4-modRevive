@@ -45,6 +45,7 @@ checkRevive(attacker, sMeansOfDeath)
 
 	deadPlayer = spawnStruct();
 	deadPlayer.location = self.origin;
+	deadPlayer.angles = self.angles;
 	deadPlayer.player = self;
 
 	team = self.pers["team"];
@@ -61,19 +62,37 @@ checkRevive(attacker, sMeansOfDeath)
 		resBox maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "waypoint" );
 		resBox maps\mp\gametypes\_gameobjects::setVisibleTeam( "friendly" );
 		resBox.useWeapon = "briefcase_bomb_mp";
+        resBox.deadPlayer = deadPlayer;
 
-		deadPlayer.resBox = resBox;
+        resBox.onUse = ::revivePlayer;
+
 		level.deadPlayers[team][self.name] = deadPlayer;
 		self IprintLnBold("deadPlayers: " + level.deadPlayers[team].size);
-
-        wait 0.5;
-        self maps\mp\gametypes\_gameobjects::spawnPlayer();
-        self.origin = deadPlayer.location;
-        self IprintLnBold("after spawn");
 	}
+}
+
+revivePlayer( medicPlayer )
+{
+    self.deadPlayer.player maps\mp\gametypes\_globallogic::spawnPlayer();
+    self.deadPlayer.player.health = 10;
+    self.deadPlayer.player spawn(self.deadPlayer.location, self.deadPlayer.angles);
+    self.deadPlayer.player maps\mp\gametypes\_class::giveLoadout( self.deadPlayer.player.team, self.deadPlayer.player.class );
+    self maps\mp\gametypes\_gameobjects::disableObject();
+    wait 0.05;
+    self.deadPlayer.player.health = getMaxHealth();
 }
 
 printInfo(pl, name1, name2, cause)
 {
 	pl IprintLnBold("Player " + name1 + " was killed by " + name2 + " using " + cause + ".\n He is ready to be revived. ;)");
+}
+
+getMaxHealth()
+{
+    if ( level.hardcoreMode )
+		return 30;
+	else if ( level.oldschool )
+		return 200;
+	else
+		return 100;
 }
