@@ -1,3 +1,6 @@
+#include common_scripts\utility;
+#include maps\mp\_utility;
+
 init()
 {
 	level.deadPlayers["axis"] = [];
@@ -18,13 +21,7 @@ onPrecacheGameType()
 
 checkRevive(attacker, sMeansOfDeath)
 {
-    players = getEntArray("player", "classname");
-	
-	for(i = 0; i < players.size; i++)
-	{
-	    // Send a message to all players notifying about the kill
-		thread printInfo(players[i], self.name, attacker.name, sMeansOfDeath );
-	}
+    printAllPlayers("Player " + self.name + " was killed by " + attacker.name + " using " + sMeansOfDeath + ".\n He is ready to be revived. ;)" );
 	self IprintLnBold("position: " + self.origin);
 
 	visuals[0] = getEnt( "sd_bomb", "targetname" );
@@ -46,7 +43,7 @@ checkRevive(attacker, sMeansOfDeath)
 	deadPlayer = spawnStruct();
 	deadPlayer.location = self.origin;
 	deadPlayer.angles = self.angles;
-	deadPlayer.player = self;
+    deadPlayer.player = self;
 
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
@@ -82,9 +79,20 @@ revivePlayer( medicPlayer )
     self.deadPlayer.player.health = getMaxHealth();
 }
 
-printInfo(pl, name1, name2, cause)
+printMsg(pl, msg)
 {
-	pl IprintLnBold("Player " + name1 + " was killed by " + name2 + " using " + cause + ".\n He is ready to be revived. ;)");
+	pl IprintLnBold(msg);
+}
+
+printAllPlayers(msg)
+{
+    players = getEntArray("player", "classname");
+	
+	for(i = 0; i < players.size; i++)
+	{
+	    // Send a message to all players notifying about the kill
+		thread printMsg(players[i], msg);
+	}
 }
 
 getMaxHealth()
