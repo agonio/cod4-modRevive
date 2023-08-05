@@ -21,22 +21,22 @@ onPrecacheGameType()
 
 checkRevive(attacker, sMeansOfDeath)
 {
+    //self endon("spawned_player")
+
     printAllPlayers("Player " + self.name + " was killed by " + attacker.name + " using " + sMeansOfDeath + ".\n He is ready to be revived. ;)" );
 	self IprintLnBold("position: " + self.origin);
 
-	visuals[0] = getEnt( "sd_bomb", "targetname" );
+	visuals[0] = spawn( "script_model", self.origin );
 	if ( !isDefined( visuals[0] ) )
 	{
-		self IprintLnBold("No sd_bomb script_model found in map.");
+		self IprintLnBold("No script_model found in map.");
 		return;
 	}
-	visuals[0] setModel( "prop_suitcase_bomb" );
 
-	bombZones = getEntArray( "bombzone", "targetname" );
-	trigger = bombZones[0];
+	trigger = spawn( "trigger_radius", self.origin, 0, 32 , 32 );
 	if ( !isDefined( trigger ) )
 	{
-		self IprintLnBold("No bombzone trigger found in map.");
+		self IprintLnBold("No trigger found in map.");
 		return;
 	}
 
@@ -48,13 +48,11 @@ checkRevive(attacker, sMeansOfDeath)
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
 	{
-		trigger.origin = self.origin;
-		visuals[0].origin = self.origin;
 		resBox = maps\mp\gametypes\_gameobjects::createUseObject( team, trigger, visuals, (0,0,32) );
 		resBox maps\mp\gametypes\_gameobjects::allowUse( "friendly" );
 		resBox maps\mp\gametypes\_gameobjects::setUseTime( 3 );
 		resBox maps\mp\gametypes\_gameobjects::setUseText( "reviving "+ self.name );
-		resBox maps\mp\gametypes\_gameobjects::setUseHintText( "hold to revive "+ self.name );
+		//resBox maps\mp\gametypes\_gameobjects::setUseHintText( "hold to revive "+ self.name );
 		resBox maps\mp\gametypes\_gameobjects::set2DIcon( "friendly", "compass_waypoint_defend" );
 		resBox maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "waypoint" );
 		resBox maps\mp\gametypes\_gameobjects::setVisibleTeam( "friendly" );
@@ -75,6 +73,9 @@ revivePlayer( medicPlayer )
     self.deadPlayer.player spawn(self.deadPlayer.location, self.deadPlayer.angles);
     self.deadPlayer.player maps\mp\gametypes\_class::giveLoadout( self.deadPlayer.player.team, self.deadPlayer.player.class );
     self maps\mp\gametypes\_gameobjects::disableObject();
+    
+	self.visuals[0] delete();
+    // self.trigger delete(); // we need to clean the trigger somehow. For each trigger a new thread-loop runs in _gameobject.gsc
     wait 0.05;
     self.deadPlayer.player.health = getMaxHealth();
 }
