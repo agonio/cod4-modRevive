@@ -77,6 +77,7 @@ revivePlayer( medicPlayer )
 	self.visuals[0] delete();
     // self.trigger delete(); // we need to clean the trigger somehow. For each trigger a new thread-loop runs in _gameobject.gsc
     wait 0.05;
+	self.deadPlayer.player IprintLnBold("works");
     self.deadPlayer.player.health = getMaxHealth();
 }
 
