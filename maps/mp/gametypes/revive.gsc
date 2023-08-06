@@ -16,6 +16,12 @@ init()
 	thread watchRounds();
 }
 
+onPrecacheGameType()
+{
+	precacheModel( "prop_suitcase_bomb" );
+	precacheModel( "revive_tool_chest" );
+}
+
 watchRounds() {
 	for(;;) {
 		level waittill("round_switch");
@@ -29,12 +35,6 @@ watchRevives() {
 		level waittill("player_revived");
 		printAliveCount();
 	}
-}
-
-onPrecacheGameType()
-{
-	precacheModel( "prop_suitcase_bomb" );
-	precacheModel( "revive_tool_chest" );
 }
 
 checkRevive(attacker, sMeansOfDeath)
