@@ -1,5 +1,14 @@
 # cod4-modRevive
-cod4 mod for sd with revive mechanic. based on modwarfare.
+is a mod for `search&destroy` adding a revive mechanic. It has the following features:
+
+- nearby players can revive team-mates after they've been killed in sd
+- display the current amount of players per team alive, when..
+  - a new round started,
+  - a player was killed,
+  - a player was revived.
+
+The mod is based on modwarfare and therefor allows all loadouts from the beginning.
+
 
 ## Setup
 
