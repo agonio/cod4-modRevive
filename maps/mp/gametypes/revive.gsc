@@ -96,6 +96,7 @@ revivePlayer( medicPlayer )
     // self.trigger delete(); // we need to clean the trigger somehow. For each trigger a new thread-loop runs in _gameobject.gsc
     wait 0.05;
     self.deadPlayer.player.health = getMaxHealth();
+	self.deadPlayer.player playLocalSound( "tacotruck" );
 }
 
 
