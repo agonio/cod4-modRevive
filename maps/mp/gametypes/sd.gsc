@@ -130,7 +130,6 @@ onPrecacheGameType()
 
 	precacheShader("waypoint_bomb");
 	precacheShader("hud_suitcase_bomb");
-	precacheShader("waypoint");
 	precacheShader("waypoint_target");
 	precacheShader("waypoint_target_a");
 	precacheShader("waypoint_target_b");
@@ -228,6 +227,8 @@ getBetterTeam()
 
 onStartGameType()
 {
+	level notify("round_switch");
+	
 	if ( !isDefined( game["switchedsides"] ) )
 		game["switchedsides"] = false;
 	

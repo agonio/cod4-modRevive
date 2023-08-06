@@ -13,6 +13,15 @@ init()
     // ***
 
 	thread watchRevives();
+	thread watchRounds();
+}
+
+watchRounds() {
+	for(;;) {
+		level waittill("round_switch");
+		wait 2; // delay print, as players don't seem to be setup already
+		printAliveCount();
+	}
 }
 
 watchRevives() {
@@ -33,8 +42,6 @@ checkRevive(attacker, sMeansOfDeath)
     //self endon("spawned_player")
 	wait ( 0.05 );
 
-    printAllPlayers("Player " + self.name + " was killed by " + attacker.name + " using " + sMeansOfDeath + ".\n He is ready to be revived. ;)" );
-	self IprintLnBold("position: " + self.origin);
 	printAliveCount();
 
 	visuals[0] = spawn( "script_model", self.origin );
@@ -65,7 +72,7 @@ checkRevive(attacker, sMeansOfDeath)
 		resBox maps\mp\gametypes\_gameobjects::setUseText( "reviving "+ self.name );
 		//resBox maps\mp\gametypes\_gameobjects::setUseHintText( "hold to revive "+ self.name );
 		resBox maps\mp\gametypes\_gameobjects::set2DIcon( "friendly", "compass_waypoint_defend" );
-		resBox maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "waypoint" );
+		resBox maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "compass_waypoint_defend" );
 		resBox maps\mp\gametypes\_gameobjects::setVisibleTeam( "friendly" );
 		resBox.useWeapon = "briefcase_bomb_mp";
         resBox.deadPlayer = deadPlayer;
@@ -73,7 +80,6 @@ checkRevive(attacker, sMeansOfDeath)
         resBox.onUse = ::revivePlayer;
 
 		level.deadPlayers[team][self.name] = deadPlayer;
-		self IprintLnBold("deadPlayers: " + level.deadPlayers[team].size);
 	}
 }
 
