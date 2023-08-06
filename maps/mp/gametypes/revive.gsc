@@ -7,10 +7,19 @@ init()
 	level.deadPlayers["allies"] = [];
 
     // rm after debug ***
-    setDvar("scr_game_matchstarttime", 0);
+    setDvar("scr_game_matchstarttime", 1);
     
-    setDvar("scr_game_playerwaittime", 0);
+    setDvar("scr_game_playerwaittime", 1);
     // ***
+
+	thread watchRevives();
+}
+
+watchRevives() {
+	for(;;) {
+		level waittill("player_revived");
+		printAliveCount();
+	}
 }
 
 onPrecacheGameType()
@@ -22,9 +31,11 @@ onPrecacheGameType()
 checkRevive(attacker, sMeansOfDeath)
 {
     //self endon("spawned_player")
+	wait ( 0.05 );
 
     printAllPlayers("Player " + self.name + " was killed by " + attacker.name + " using " + sMeansOfDeath + ".\n He is ready to be revived. ;)" );
 	self IprintLnBold("position: " + self.origin);
+	printAliveCount();
 
 	visuals[0] = spawn( "script_model", self.origin );
 	if ( !isDefined( visuals[0] ) )
@@ -73,11 +84,19 @@ revivePlayer( medicPlayer )
     self.deadPlayer.player spawn(self.deadPlayer.location, self.deadPlayer.angles);
     self.deadPlayer.player maps\mp\gametypes\_class::giveLoadout( self.deadPlayer.player.team, self.deadPlayer.player.class );
     self maps\mp\gametypes\_gameobjects::disableObject();
+	level notify("player_revived");
     
 	self.visuals[0] delete();
     // self.trigger delete(); // we need to clean the trigger somehow. For each trigger a new thread-loop runs in _gameobject.gsc
     wait 0.05;
     self.deadPlayer.player.health = getMaxHealth();
+}
+
+
+printAliveCount() 
+{
+	printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
+	printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
 }
 
 printMsg(pl, msg)
@@ -91,8 +110,22 @@ printAllPlayers(msg)
 	
 	for(i = 0; i < players.size; i++)
 	{
-	    // Send a message to all players notifying about the kill
+	    // Send a message to all players
 		thread printMsg(players[i], msg);
+	}
+}
+
+printTeam(msg, team)
+{
+	players = getEntArray("player", "classname");
+	
+	for(i = 0; i < players.size; i++)
+	{
+		if (players[i].pers["team"] == team) 
+		{
+			// Send a message to all team players
+			thread printMsg(players[i], msg);
+		}
 	}
 }
 
