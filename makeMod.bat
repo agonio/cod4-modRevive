@@ -4,6 +4,8 @@ del mod.ff
 xcopy ui_mp ..\..\raw\ui_mp /SY
 xcopy maps ..\..\raw\maps /SY
 xcopy xModel ..\..\raw\xModel /SY
+xcopy soundalias ..\..\raw\sounds /SY
+xcopy sound ..\..\raw\soundaliases /SY
 
 copy /Y mod.csv ..\..\zone_source
 cd ..\..\bin
@@ -13,5 +15,6 @@ copy ..\..\zone\english\mod.ff
 7za a -r -tzip z_modrevive.iwd maps
 7za a -r -tzip z_modrevive.iwd images
 7za a -r -tzip z_modrevive.iwd xModel
+7za a -r -tzip z_modrevive.iwd sounds
 
 pause
