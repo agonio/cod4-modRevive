@@ -13,11 +13,14 @@ If everything is setup correctly you simply need to run `makeMod.bat`.
 These files should be generated/updated:
 - mod.ff
 - z_modrevive.iwd
-- z_mp_maps.iwd
+
+⚠ If the client is still running, only .tmpX files will be generated.
 
 ## Run / Test
 
-To run the game with the mod, create a shortcut to the mp bin with following parameters `"<path_to_iw3mp.exe>" +set developer 1 +set fs_game mods/ModRevive`
+To run the game with the mod, create a shortcut to the mp bin with following parameters: 
+
+`"<path_to_iw3mp.exe>" +set developer 1 +set fs_game mods/ModRevive`
 
 In the game launch a server with the `sd` gamemode.
 
