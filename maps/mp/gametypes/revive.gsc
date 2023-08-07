@@ -5,12 +5,6 @@
 
 setup()
 {
-    // rm after debug ***
-    setDvar("scr_game_matchstarttime", 1);
-    
-    setDvar("scr_game_playerwaittime", 1);
-    // ***
-
 	thread watchRevives();
 	thread watchRounds();
 	thread watchPrematch();
@@ -43,7 +37,6 @@ watchRevives() {
 
 checkRevive(attacker, sMeansOfDeath)
 {
-    //self endon("spawned_player")
 	wait ( 0.05 );
 
 	printAliveCount();
@@ -91,7 +84,7 @@ checkIfReviving( deadPlayer, trigger, resBox )
 	level endon( "game_ended" );
 
 	barData = spawnStruct();
-	barData.useText = "reviving "+ deadPlayer.name;
+	barData.useText = "reviving ^2"+ deadPlayer.name;
 	barData.inUse = false;
 	barData.useRate = 1;
 	barData.curProgress = 0;
@@ -99,7 +92,7 @@ checkIfReviving( deadPlayer, trigger, resBox )
 
 	text = createFontString( "objective", 1.5 );
 	text setPoint("CENTER", undefined, level.primaryProgressBarTextX, level.primaryProgressBarTextY);
-	text setText("hold 'USE' to revive "+ deadPlayer.name);
+	text setText("hold 'USE' to revive ^2"+ deadPlayer.name);
 	
 	// Stay here as long as the body exists and the player is touching it
 	while ( isDefined( self ) && isDefined( deadPlayer.body ) && self isTouching( trigger ) ) {
@@ -137,7 +130,7 @@ revivePlayer( deadPlayer, resBox )
     deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
     deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
     resBox disableObject();
-	
+
 	level notify("player_revived");
 	deadPlayer notify("revived");
     
