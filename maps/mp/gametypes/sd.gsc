@@ -98,7 +98,7 @@ main()
 	maps\mp\gametypes\_globallogic::registerRoundLimitDvar( level.gameType, 0, 0, 12 );
 	maps\mp\gametypes\_globallogic::registerNumLivesDvar( level.gameType, 1, 0, 10 );
 	
-	maps\mp\gametypes\revive::init();
+	maps\mp\gametypes\revive::setup();
 	
 	level.teamBased = true;
 	level.overrideTeamScore = true;
@@ -297,6 +297,7 @@ onStartGameType()
 
 onSpawnPlayer()
 {
+	self.checkingBody = false;
 	self.isPlanting = false;
 	self.isDefusing = false;
 	self.isBombCarrier = false;

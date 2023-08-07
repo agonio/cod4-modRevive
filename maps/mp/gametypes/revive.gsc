@@ -1,7 +1,9 @@
 #include common_scripts\utility;
 #include maps\mp\_utility;
+#include maps\mp\gametypes\_hud_util;
+#include maps\mp\gametypes\_gameobjects;
 
-init()
+setup()
 {
 	level.deadPlayers["axis"] = [];
 	level.deadPlayers["allies"] = [];
@@ -44,59 +46,115 @@ checkRevive(attacker, sMeansOfDeath)
 
 	printAliveCount();
 
-	visuals[0] = spawn( "script_model", self.origin );
+	// wait for body's final position
+	wait(1.5);
+
+	visuals[0] = spawn( "script_model", self.body.origin );
 	if ( !isDefined( visuals[0] ) )
 	{
 		self IprintLnBold("No script_model found in map.");
 		return;
 	}
 
-	trigger = spawn( "trigger_radius", self.origin, 0, 32 , 32 );
+	trigger = spawn( "trigger_radius", self.body.origin, 0, 32 , 32 );
 	if ( !isDefined( trigger ) )
 	{
 		self IprintLnBold("No trigger found in map.");
 		return;
 	}
 
-	deadPlayer = spawnStruct();
-	deadPlayer.location = self.origin;
-	deadPlayer.angles = self.angles;
-    deadPlayer.player = self;
-
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
 	{
-		resBox = maps\mp\gametypes\_gameobjects::createUseObject( team, trigger, visuals, (0,0,32) );
-		resBox maps\mp\gametypes\_gameobjects::allowUse( "friendly" );
-		resBox maps\mp\gametypes\_gameobjects::setUseTime( 3 );
-		resBox maps\mp\gametypes\_gameobjects::setUseText( "reviving "+ self.name );
-		//resBox maps\mp\gametypes\_gameobjects::setUseHintText( "hold to revive "+ self.name );
-		resBox maps\mp\gametypes\_gameobjects::set2DIcon( "friendly", "compass_waypoint_defend" );
-		resBox maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "compass_waypoint_defend" );
-		resBox maps\mp\gametypes\_gameobjects::setVisibleTeam( "friendly" );
-		resBox.useWeapon = "briefcase_bomb_mp";
-        resBox.deadPlayer = deadPlayer;
+		resBox = createUseObject( team, trigger, visuals, (0,0,32) );
+		resBox allowUse( "friendly" );
+		resBox setUseTime( 0 );
+		resBox set2DIcon( "friendly", "compass_waypoint_defend" );
+		resBox set3DIcon( "friendly", "compass_waypoint_defend" );
+		resBox setVisibleTeam( "friendly" );
 
-        resBox.onUse = ::revivePlayer;
-
-		level.deadPlayers[team][self.name] = deadPlayer;
+		self thread monitorBody(trigger, resBox);
 	}
 }
 
-revivePlayer( medicPlayer )
+monitorBody(trigger, resBox) {
+	self endon("disconnect");
+	self endon("revived");
+	level endon( "game_ended" );
+
+	for (;;)
+	{
+		wait (0.05);
+		trigger waittill("trigger", player);
+		if ( player.pers["team"] == self.pers["team"] && !player.checkingBody ) {
+			player.checkingBody = true;
+			player thread checkIfReviving( self, trigger, resBox );		
+		}
+	}	
+}
+
+checkIfReviving( deadPlayer, trigger, resBox )
 {
-    self.deadPlayer.player maps\mp\gametypes\_globallogic::spawnPlayer();
-    self.deadPlayer.player.health = 10;
-    self.deadPlayer.player spawn(self.deadPlayer.location, self.deadPlayer.angles);
-    self.deadPlayer.player maps\mp\gametypes\_class::giveLoadout( self.deadPlayer.player.team, self.deadPlayer.player.class );
-    self maps\mp\gametypes\_gameobjects::disableObject();
+	self endon("disconnect");
+	self endon("death");
+	level endon( "game_ended" );
+
+	barData = spawnStruct();
+	barData.useText = "reviving "+ deadPlayer.name;
+	barData.inUse = false;
+	barData.useRate = 1;
+	barData.curProgress = 0;
+	barData.useTime = 3000;
+
+	//self IprintLnBold("hold 'USE' to revive "+ deadPlayer.name);
+	text = createFontString( "objective", 1.5 );
+	text setPoint("CENTER", undefined, level.primaryProgressBarTextX, level.primaryProgressBarTextY);
+	text setText("hold 'USE' to revive "+ deadPlayer.name);
+	
+	// Stay here as long as the body exists and the player is touching it
+	while ( isDefined( self ) && isDefined( deadPlayer.body ) && self isTouching( trigger ) ) {
+		wait (0.05);
+		text.alpha = 1;
+		barData.curProgress = 0;
+		// track use button pressed
+		while (self isTouching( trigger ) && self useButtonPressed() && barData.curProgress < barData.useTime) {
+			text.alpha = 0;
+			barData.inUse = true;
+			self thread personalUseBar(barData);
+			self disableWeapons();
+			wait (0.05);
+			barData.curProgress += 50;
+		}
+		barData.inUse = false;
+		self enableWeapons();
+
+		if (barData.curProgress >= barData.useTime) {
+			wait (0.05);
+			revivePlayer(deadPlayer, resBox);
+			break;
+		}
+	}
+	text destroy();
+
+	// Body is not there or the player is not touching the trigger anymore	
+	self.checkingBody = false;	
+}
+
+revivePlayer( deadPlayer, resBox )
+{
+    deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
+    deadPlayer.health = 10;
+    deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
+    deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
+    resBox disableObject();
 	level notify("player_revived");
+	deadPlayer notify("revived");
     
-	self.visuals[0] delete();
-    // self.trigger delete(); // we need to clean the trigger somehow. For each trigger a new thread-loop runs in _gameobject.gsc
+	resBox.visuals[0] delete();
+    resBox.trigger delete();
     wait 0.05;
-    self.deadPlayer.player.health = getMaxHealth();
-	self.deadPlayer.player playLocalSound( "tacotruck" );
+    deadPlayer.health = getMaxHealth();
+	deadPlayer playLocalSound( "tacotruck" );
 }
 
 
