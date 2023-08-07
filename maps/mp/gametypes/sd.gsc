@@ -158,8 +158,6 @@ onPrecacheGameType()
 	precacheString( &"MP_CANT_PLANT_WITHOUT_BOMB" );	
 	precacheString( &"MP_PLANTING_EXPLOSIVE" );	
 	precacheString( &"MP_DEFUSING_EXPLOSIVE" );	
-	
-	maps\mp\gametypes\revive::onPrecacheGameType();
 }
 
 onRoundSwitch()

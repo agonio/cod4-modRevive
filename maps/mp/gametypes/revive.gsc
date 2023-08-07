@@ -5,9 +5,6 @@
 
 setup()
 {
-	level.deadPlayers["axis"] = [];
-	level.deadPlayers["allies"] = [];
-
     // rm after debug ***
     setDvar("scr_game_matchstarttime", 1);
     
@@ -16,15 +13,19 @@ setup()
 
 	thread watchRevives();
 	thread watchRounds();
+	thread watchPrematch();
 }
 
-onPrecacheGameType()
-{
-	precacheModel( "prop_suitcase_bomb" );
-	precacheModel( "revive_tool_chest" );
+watchPrematch() {
+	level endon("game_ended");
+	for(;;) {
+		level waittill("prematch_over");
+		printAliveCount();
+	}
 }
 
 watchRounds() {
+	level endon("game_ended");
 	for(;;) {
 		level waittill("round_switch");
 		wait 2; // delay print, as players don't seem to be setup already
@@ -33,6 +34,7 @@ watchRounds() {
 }
 
 watchRevives() {
+	level endon("game_ended");
 	for(;;) {
 		level waittill("player_revived");
 		printAliveCount();
@@ -50,18 +52,7 @@ checkRevive(attacker, sMeansOfDeath)
 	wait(1.5);
 
 	visuals[0] = spawn( "script_model", self.body.origin );
-	if ( !isDefined( visuals[0] ) )
-	{
-		self IprintLnBold("No script_model found in map.");
-		return;
-	}
-
 	trigger = spawn( "trigger_radius", self.body.origin, 0, 32 , 32 );
-	if ( !isDefined( trigger ) )
-	{
-		self IprintLnBold("No trigger found in map.");
-		return;
-	}
 
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
@@ -106,7 +97,6 @@ checkIfReviving( deadPlayer, trigger, resBox )
 	barData.curProgress = 0;
 	barData.useTime = 3000;
 
-	//self IprintLnBold("hold 'USE' to revive "+ deadPlayer.name);
 	text = createFontString( "objective", 1.5 );
 	text setPoint("CENTER", undefined, level.primaryProgressBarTextX, level.primaryProgressBarTextY);
 	text setText("hold 'USE' to revive "+ deadPlayer.name);
@@ -147,6 +137,7 @@ revivePlayer( deadPlayer, resBox )
     deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
     deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
     resBox disableObject();
+	
 	level notify("player_revived");
 	deadPlayer notify("revived");
     
