@@ -45,7 +45,7 @@ checkRevive(attacker, sMeansOfDeath)
 	wait(1.5);
 
 	visuals[0] = spawn( "script_model", self.body.origin );
-	trigger = spawn( "trigger_radius", self.body.origin, 0, 32 , 32 );
+	trigger = spawn( "trigger_radius", self.body.origin, 0, 45 , 45 );
 
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
