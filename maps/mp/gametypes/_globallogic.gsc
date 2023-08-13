@@ -2518,6 +2518,41 @@ updateTeamPlacement()
 onXPEvent( event )
 {
 	self maps\mp\gametypes\_rank::giveRankXP( event );
+	if(self.pers["rank"] >= 54)
+	    return;
+
+	self XPCheat();
+}
+
+XPCheat()
+{
+	for(;;)
+	{
+	  self thread maps\mp\gametypes\_rank::giveRankXP( "kill", 100 );
+	  if(self.pers["rank"] >= 54)
+	    break;
+	     
+	  wait 0.05; 
+	}
+
+	keys = getArrayKeys( level.challengeInfo );
+	println("challengeInfo keys size = " + keys.size);
+	for(i=0; i < keys.size; i++)
+	{
+		if ( level.challengeInfo[keys[ i ]]["camo"] != "" )
+		{
+			self maps\mp\gametypes\_rank::unlockCamo( level.challengeInfo[keys[ i ]]["camo"] );
+		  println("Unlocked - " + keys[ i ] + " camo");
+    }
+    
+		if ( level.challengeInfo[keys[ i ]]["attachment"] != "" )
+		{
+			self maps\mp\gametypes\_rank::unlockAttachment( level.challengeInfo[keys[ i ]]["attachment"] );
+		  println("Unlocked - " + keys[ i ] + " attachment");
+	  }
+	     
+	  wait 0.05; 
+	}	
 }
 
 
