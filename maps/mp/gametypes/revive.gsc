@@ -72,6 +72,10 @@ monitorBody(trigger, resBox) {
 		trigger waittill("trigger", player);
 		if ( player.pers["team"] == self.pers["team"] && !player.checkingBody ) {
 			player.checkingBody = true;
+			
+			if (isdefined(self.droppedDeathItem)) {
+				self.droppedDeathItem triggerOff();
+			}
 			player thread checkIfReviving( self, trigger, resBox );		
 		}
 	}	
@@ -120,7 +124,10 @@ checkIfReviving( deadPlayer, trigger, resBox )
 	text destroy();
 
 	// Body is not there or the player is not touching the trigger anymore	
-	self.checkingBody = false;	
+	self.checkingBody = false;
+	if (isdefined(deadPlayer.droppedDeathItem)) {
+		deadPlayer.droppedDeathItem triggerOn();
+	}
 }
 
 revivePlayer( deadPlayer, resBox )
