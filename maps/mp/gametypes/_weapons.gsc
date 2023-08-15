@@ -266,6 +266,7 @@ dropWeaponForDeath( attacker )
 	#/
 	
 	self.droppedDeathWeapon = true;
+	self.droppedDeathItem = item;
 
 	item ItemWeaponSetAmmo( clipAmmo, stockAmmo );
 	item itemRemoveAmmoFromAltModes();
@@ -327,7 +328,14 @@ watchPickup()
 		droppedItem.owner = player.tookWeaponFrom[ droppedWeaponName ];
 		droppedItem.ownersattacker = player;
 		player.tookWeaponFrom[ droppedWeaponName ] = undefined;
+	} else {
+		//swap owner
+		droppedItem.owner = self.owner;
+		droppedItem.ownersattacker = player;
 	}
+	//exchange dropped weapon that the revive trigger also disables the switched weapon
+	self.owner.droppedDeathItem = droppedItem;
+
 	droppedItem thread watchPickup();
 	
 	// take owner information from self and put it onto player
