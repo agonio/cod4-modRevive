@@ -224,9 +224,7 @@ getBetterTeam()
 }
 
 onStartGameType()
-{
-	level notify("round_switch");
-	
+{	
 	if ( !isDefined( game["switchedsides"] ) )
 		game["switchedsides"] = false;
 	
