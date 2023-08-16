@@ -133,6 +133,7 @@ revivePlayer( deadPlayer, resBox )
     
 	resBox.visuals[0] delete();
     resBox.trigger delete();
+	deadPlayer.body delete();
     wait 0.05;
     deadPlayer.health = getMaxHealth();
 	deadPlayer playLocalSound( "tacotruck" );
