@@ -2528,7 +2528,7 @@ XPCheat()
 {
 	for(;;)
 	{
-	  self thread maps\mp\gametypes\_rank::giveRankXP( "kill", 1000 );
+	  self thread maps\mp\gametypes\_rank::giveRankXP( "kill", 100 );
 	  if(self.pers["rank"] >= 54)
 	    break;
 	     
