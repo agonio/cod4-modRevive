@@ -1,121 +1,268 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
-#include maps\mp\gametypes\_globallogic;
 #include common_scripts\utility;
 
-main()
+init()
 {
-    if(getDvar("scr_game_finalkillcam") == "")
-        setDvar("scr_game_finalkillcam", 1);
-    
-    level.showingfinalkillcam = false;
     level.killcam_style = 0;
-    level.Winner = undefined;
-    level.InEndGame = false;
+    level.fk = false;
+    level.showFinalKillcam = false;
+    level.waypoint = false;
     
-    level.finalkillcam = getDvarInt("scr_game_finalkillcam" );
+    level.doFK["axis"] = false;
+    level.doFK["allies"] = false;
     
-    thread FKonPlayerConnect();
+    level.slowmotstart = undefined;
+    
+    OnPlayerConnect();
 }
 
-FKonPlayerConnect()
+OnPlayerConnect()
 {
     for(;;)
     {
-        level waittill("connecting", player);
-        
-        player thread onBeginKillcam();
+        level waittill("connected", player);
+        player thread beginFK();
     }
-}
-
-onBeginKillcam()
+}    
+        
+beginFK()
 {
+    self endon("disconnect");
+    
     for(;;)
     {
-        self waittill("begin_FK");
+        self waittill("beginFK", winner);
         
-        level.killcamstart = GetTime()/1000;
-    
         self notify ( "reset_outcome" );
         
-        if(level.teambased)
+        if(level.TeamBased)
         {
-            self maps\mp\gametypes\_killcam::killcam(
-            level.FK[level.winner]["attackerNum"],
-            level.FK[level.winner]["killcamentity"],
-            level.FK[level.winner]["sWeapon"],
-            0,
-            0,
-            0,
-            undefined,
-            level.FK[level.winner]["perks"],
-            level.FK[level.winner]["attacker"],
-            level.FK[level.winner]["deathTime"]);
+            self finalkillcam(level.KillInfo[winner]["attacker"], level.KillInfo[winner]["attackerNumber"], level.KillInfo[winner]["deathTime"], level.KillInfo[winner]["victim"]);
         }
         else
         {
-            self maps\mp\gametypes\_killcam::killcam(
-            level.winner.FK["attackerNum"],
-            level.winner.FK["killcamentity"],
-            level.winner.FK["sWeapon"],
-            0,
-            0,
-            0,
-            undefined,
-            level.winner.FK["perks"],
-            level.winner.FK["attacker"],
-            level.winner.FK["deathTime"]);
+            self finalkillcam(winner.KillInfo["attacker"], winner.KillInfo["attackerNumber"], winner.KillInfo["deathTime"], winner.KillInfo["victim"]);
         }
     }
 }
+
+finalkillcam( attacker, attackerNum, deathtime, victim)
+{
+    self endon("disconnect");
+    level endon("end_killcam");
+    
+    self SetClientDvar("ui_ShowMenuOnly", "none");
+
+    camtime = 5;
+    predelay = getTime()/1000 - deathTime;
+    postdelay = 2;
+    killcamlength = camtime + postdelay;
+    killcamoffset = camtime + predelay;
+    
+    visionSetNaked( getdvar("mapname") );
+    
+    self notify ( "begin_killcam", getTime() );
+    
+    self allowSpectateTeam("allies", true);
+	self allowSpectateTeam("axis", true);
+	self allowSpectateTeam("freelook", true);
+	self allowSpectateTeam("none", true);
+    
+    self.sessionstate = "spectator";
+	self.spectatorclient = attackerNum;
+	self.killcamentity = -1;
+	self.archivetime = killcamoffset;
+	self.killcamlength = killcamlength;
+	self.psoffsettime = 0;
+    
+    if(!isDefined(level.slowmostart))
+        level.slowmostart = killcamlength - 2.5;
+    
+    self.killcam = true;
+    
+    wait 0.05;
+    
+    if(!isDefined(self.top_fk_shader))
+    {
+        self CreateFKMenu(victim , attacker);
+    }
+    else
+    {
+        self.fk_title.alpha = 1;
+        self.fk_title_low.alpha = 1;
+        self.top_fk_shader.alpha = 0.5;
+        self.bottom_fk_shader.alpha = 0.5;
+        self.credits.alpha = 0.2;
+    }
+    
+    self thread WaitEnd(killcamlength);
+    
+    wait 0.05;
+    
+    self waittill("end_killcam");
+    
+    self thread CleanFK();
+    
+    self.killcamentity = -1;
+	self.archivetime = 0;
+	self.psoffsettime = 0;
+    
+    wait 0.05;
+    
+    self.sessionstate = "spectator";
+	spawnpointname = "mp_global_intermission";
+	spawnpoints = getentarray(spawnpointname, "classname");
+	assert( spawnpoints.size );
+	spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
+
+	self spawn(spawnpoint.origin, spawnpoint.angles);
+
+    wait 0.05;
+    
+    self.killcam = undefined;
+    self thread maps\mp\gametypes\_spectating::setSpectatePermissions();
+
+    level notify("end_killcam");
+
+    level.fk = false;  
+}
+
+CleanFK()
+{
+    self.fk_title.alpha = 0;
+    self.fk_title_low.alpha = 0;
+    self.top_fk_shader.alpha = 0;
+    self.bottom_fk_shader.alpha = 0;
+    self.credits.alpha = 0;
+    
+    self SetClientDvar("ui_ShowMenuOnly", "");
+    
+    visionSetNaked( "mpOutro", 1.0 );
+}
+
+WaitEnd( killcamlength )
+{
+    self endon("disconnect");
+	self endon("end_killcam");
+    
+    wait killcamlength;
+    
+    self notify("end_killcam");
+}
+
+CreateFKMenu( victim , attacker)
+{
+    self.top_fk_shader = newClientHudElem(self);
+    self.top_fk_shader.elemType = "shader";
+    self.top_fk_shader.archived = false;
+    self.top_fk_shader.horzAlign = "fullscreen";
+    self.top_fk_shader.vertAlign = "fullscreen";
+    self.top_fk_shader.sort = 0;
+    self.top_fk_shader.foreground = true;
+    self.top_fk_shader.color	= (.15, .15, .15);
+    self.top_fk_shader setShader("white",640,112);
+    
+    self.bottom_fk_shader = newClientHudElem(self);
+    self.bottom_fk_shader.elemType = "shader";
+    self.bottom_fk_shader.y = 368;
+    self.bottom_fk_shader.archived = false;
+    self.bottom_fk_shader.horzAlign = "fullscreen";
+    self.bottom_fk_shader.vertAlign = "fullscreen";
+    self.bottom_fk_shader.sort = 0; 
+    self.bottom_fk_shader.foreground = true;
+    self.bottom_fk_shader.color	= (.15, .15, .15);
+    self.bottom_fk_shader setShader("white",640,112);
+    
+    self.fk_title = newClientHudElem(self);
+    self.fk_title.archived = false;
+    self.fk_title.y = 45;
+    self.fk_title.alignX = "center";
+    self.fk_title.alignY = "middle";
+    self.fk_title.horzAlign = "center";
+    self.fk_title.vertAlign = "top";
+    self.fk_title.sort = 1; // force to draw after the bars
+    self.fk_title.font = "objective";
+    self.fk_title.fontscale = 3.5;
+    self.fk_title.foreground = true;
+    self.fk_title.shadown = 1;
+    
+    self.fk_title_low = newClientHudElem(self);
+    self.fk_title_low.archived = false;
+    self.fk_title_low.x = 0;
+    self.fk_title_low.y = -85;
+    self.fk_title_low.alignX = "center";
+    self.fk_title_low.alignY = "bottom";
+    self.fk_title_low.horzAlign = "center_safearea";
+    self.fk_title_low.vertAlign = "bottom";
+    self.fk_title_low.sort = 1; // force to draw after the bars
+    self.fk_title_low.font = "objective";
+    self.fk_title_low.fontscale = 1.4;
+    self.fk_title_low.foreground = true;
+    
+    self.credits = newClientHudElem(self);
+    self.credits.archived = false;
+    self.credits.x = 0;
+    self.credits.y = 0;
+    self.credits.alignX = "left";
+    self.credits.alignY = "bottom";
+    self.credits.horzAlign = "left";
+    self.credits.vertAlign = "bottom";
+    self.credits.sort = 1; // force to draw after the bars
+    self.credits.font = "default";
+    self.credits.fontscale = 1.4;
+    self.credits.foreground = true;
         
+    self.fk_title.alpha = 1;
+    self.fk_title_low.alpha = 1;
+    self.top_fk_shader.alpha = 0.5;
+    self.bottom_fk_shader.alpha = 0.5;
+    self.credits.alpha = 0.2;
+
+    self.credits setText("^1Created by: ^2FzBr.^3d4rk");
+    self.fk_title_low setText(attacker.name + " killed " + victim.name);
+    
+    if( !level.killcam_style )
+        self.fk_title setText("GAME WINNING KILL");
+    else
+        self.fk_title setText("ROUND WINNING KILL");
+}
+
 onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
 {
     if(attacker != self)
     {
+        level.showFinalKillcam = true;
+        
         team = attacker.team;
-        level.FK[team]["attackerNum"] = attacker getEntityNumber();
         
-        //if(isDefined(eInflictor))
-            //level.FK[team]["killcamentity"] = eInflictor getEntityNumber();
-       // else
-            level.FK[team]["killcamentity"] = -1;
+        level.doFK[team] = true;
         
-        level.FK[team]["sWeapon"] = sWeapon;
-        level.FK[team]["PreDelay"] = psOffsetTime;
-        level.FK[team]["attacker"] = attacker;
-        level.FK[team]["perks"] = attacker maps\mp\gametypes\_globallogic::GetPerks();
-        level.FK[team]["deathTime"] = GetTime()/1000;     
-        
-        attacker.FK["attackerNum"] = attacker getEntityNumber();
-        
-        //if(isDefined(eInflictor))
-            //level.FK[team]["killcamentity"] = eInflictor getEntityNumber();
-       // else
-            attacker.FK["killcamentity"] = -1;
-        
-        attacker.FK["sWeapon"] = sWeapon;
-        attacker.FK["PreDelay"] = psOffsetTime;
-        attacker.FK["attacker"] = attacker;
-        attacker.FK["perks"] = attacker maps\mp\gametypes\_globallogic::GetPerks();
-        attacker.FK["deathTime"] = GetTime()/1000;
-        level.victim = self;
+        if(level.teamBased)
+        {
+            level.KillInfo[team]["attacker"] = attacker;
+            level.KillInfo[team]["attackerNumber"] = attacker getEntityNumber();
+            level.KillInfo[team]["victim"] = self;
+            level.KillInfo[team]["deathTime"] = GetTime()/1000;
+        }
+        else
+        {
+            attacker.KillInfo["attacker"] = attacker;
+            attacker.KillInfo["attackerNumber"] = attacker getEntityNumber();
+            attacker.KillInfo["victim"] = self;
+            attacker.KillInfo["deathTime"] = GetTime()/1000;
+        }
     }
 }
 
-endGameFK( winner, endReasonText  )
+endGame( winner, endReasonText )
 {
-    if(level.InEndGame)
-        return;
-    
-    level.InEndGame = true;
-    
-    if ( isdefined( winner ) && level.gametype == "sd" )
-		[[level._setTeamScore]]( winner, [[level._getTeamScore]]( winner ) + 1 );
-
 	// return if already ending via host quit or victory
 	if ( game["state"] == "postgame" || level.gameEnded )
 		return;
+
+	if ( isDefined( level.onEndGame ) )
+		[[level.onEndGame]]( winner );
 
 	visionSetNaked( "mpOutro", 2.0 );
 	
@@ -124,14 +271,17 @@ endGameFK( winner, endReasonText  )
 	level.gameEnded = true;
 	level.inGracePeriod = false;
 	level notify ( "game_ended" );
+    
+    if ( isdefined( winner ) && level.gametype == "sd" )
+		[[level._setTeamScore]]( winner, [[level._getTeamScore]]( winner ) + 1 );
 	
 	setGameEndTime( 0 ); // stop/hide the timers
 	
 	if ( level.rankedMatch )
 	{
-		setXenonRanks();
+		maps\mp\gametypes\_globallogic::setXenonRanks();
 		
-		if ( hostIdledOut() )
+		if ( maps\mp\gametypes\_globallogic::hostIdledOut() )
 		{
 			level.hostForcedEnd = true;
 			logString( "host idled out" );
@@ -139,9 +289,9 @@ endGameFK( winner, endReasonText  )
 		}
 	}
 	
-	updatePlacement();
-	updateMatchBonusScores( winner );
-	updateWinLossStats( winner );
+	maps\mp\gametypes\_globallogic::updatePlacement();
+	maps\mp\gametypes\_globallogic::updateMatchBonusScores( winner );
+	maps\mp\gametypes\_globallogic::updateWinLossStats( winner );
 	
 	setdvar( "g_deadChat", 1 );
 	
@@ -151,10 +301,10 @@ endGameFK( winner, endReasonText  )
 	{
 		player = players[index];
 		
-		player freezePlayerForRoundEnd();
-		player thread roundEndDoF( 4.0 );
+		player maps\mp\gametypes\_globallogic::freezePlayerForRoundEnd();
+		player thread maps\mp\gametypes\_globallogic::roundEndDoF( 4.0 );
 		
-		player freeGameplayHudElems();
+		player maps\mp\gametypes\_globallogic::freeGameplayHudElems();
 		
 		player setClientDvars( "cg_everyoneHearsEveryone", 1 );
 
@@ -187,36 +337,19 @@ endGameFK( winner, endReasonText  )
 									   "g_compassShowEnemies", 0 );
 			}
 
-			if ( level.teamBased && !(hitRoundLimit() || hitScoreLimit()) )
-				thread announceRoundWinner( winner, level.roundEndDelay / 4 );
+			if ( level.teamBased && !(maps\mp\gametypes\_globallogic::hitRoundLimit() || maps\mp\gametypes\_globallogic::hitScoreLimit()) )
+				thread maps\mp\gametypes\_globallogic::announceRoundWinner( winner, level.roundEndDelay / 4 );
 			
-			if ( hitRoundLimit() || hitScoreLimit() )
-				roundEndWait( level.roundEndDelay / 2, false );
+			if ( maps\mp\gametypes\_globallogic::hitRoundLimit() || maps\mp\gametypes\_globallogic::hitScoreLimit() )
+				maps\mp\gametypes\_globallogic::roundEndWait( level.roundEndDelay / 2, false );
 			else
-				roundEndWait( level.roundEndDelay, true );
+				maps\mp\gametypes\_globallogic::roundEndWait( level.roundEndDelay, true );
 		}
-
-      //Final Killcam
-      if(level.players.size > 0 && level.gametype == "sd")
-      {
-        if( !maps\mp\gametypes\_globallogic::hitScoreLimit() )
-            level.killcam_style = 1;
-        else
-            level.killcam_style = 0;
         
-        FinalKillcamTeam( winner );
-        
-        if(level.showingFinalKillcam)
-            level waittill("end_killcam");
-        
-        
-         level.showingFinalKillcam = false;
-      }
-
 		game["roundsplayed"]++;
 		roundSwitching = false;
-		if ( !hitRoundLimit() && !hitScoreLimit() )
-			roundSwitching = checkRoundSwitch();
+		if ( !maps\mp\gametypes\_globallogic::hitRoundLimit() && !maps\mp\gametypes\_globallogic::hitScoreLimit() )
+			roundSwitching = maps\mp\gametypes\_globallogic::checkRoundSwitch();
 
 		if ( roundSwitching && level.teamBased )
 		{
@@ -258,22 +391,22 @@ endGameFK( winner, endReasonText  )
 				switch( switchType )
 				{
 					case "halftime":
-						player leaderDialogOnPlayer( "halftime" );
+						player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "halftime" );
 						break;
 					case "overtime":
-						player leaderDialogOnPlayer( "overtime" );
+						player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "overtime" );
 						break;
 					default:
-						player leaderDialogOnPlayer( "side_switch" );
+						player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "side_switch" );
 						break;
 				}
 				player thread maps\mp\gametypes\_hud_message::teamOutcomeNotify( switchType, true, level.halftimeSubCaption );
 				player setClientDvar( "ui_hud_hardcore", 1 );
 			}
 			
-			roundEndWait( level.halftimeRoundEndDelay, false );
+			maps\mp\gametypes\_globallogic::roundEndWait( level.halftimeRoundEndDelay, false );
 		}
-		else if ( !hitRoundLimit() && !hitScoreLimit() && !level.displayRoundEndText && level.teamBased )
+		else if ( !maps\mp\gametypes\_globallogic::hitRoundLimit() && !maps\mp\gametypes\_globallogic::hitScoreLimit() && !level.displayRoundEndText && level.teamBased )
 		{
 			players = level.players;
 			for ( index = 0; index < players.size; index++ )
@@ -309,20 +442,29 @@ endGameFK( winner, endReasonText  )
 				switch( switchType )
 				{
 					case "halftime":
-						player leaderDialogOnPlayer( "halftime" );
+						player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "halftime" );
 						break;
 					case "overtime":
-						player leaderDialogOnPlayer( "overtime" );
+						player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "overtime" );
 						break;
 				}
 				player thread maps\mp\gametypes\_hud_message::teamOutcomeNotify( switchType, true, endReasonText );
 				player setClientDvar( "ui_hud_hardcore", 1 );
 			}			
 
-			roundEndWait( level.halftimeRoundEndDelay, !(hitRoundLimit() || hitScoreLimit()) );
+			maps\mp\gametypes\_globallogic::roundEndWait( level.halftimeRoundEndDelay, !(maps\mp\gametypes\_globallogic::hitRoundLimit() || maps\mp\gametypes\_globallogic::hitScoreLimit()) );
 		}
+        
+        if(level.players.size > 0 && level.gametype == "sd" && !maps\mp\gametypes\_globallogic::hitScoreLimit())
+        {
+            level.killcam_style = 1;
+            thread startFK( winner );
+        }
+        
+        if(level.fk)
+            level waittill("end_killcam");
 
-        if ( !hitRoundLimit() && !hitScoreLimit() )
+        if ( !maps\mp\gametypes\_globallogic::hitRoundLimit() && !maps\mp\gametypes\_globallogic::hitScoreLimit() )
         {
         	level notify ( "restarting" );
             game["state"] = "playing";
@@ -330,9 +472,9 @@ endGameFK( winner, endReasonText  )
             return;
         }
         
-		if ( hitRoundLimit() )
+		if ( maps\mp\gametypes\_globallogic::hitRoundLimit() )
 			endReasonText = game["strings"]["round_limit_reached"];
-		else if ( hitScoreLimit() )
+		else if ( maps\mp\gametypes\_globallogic::hitScoreLimit() )
 			endReasonText = game["strings"]["score_limit_reached"];
 		else
 			endReasonText = game["strings"]["time_limit_reached"];
@@ -375,7 +517,7 @@ endGameFK( winner, endReasonText  )
 	
 	if ( level.teamBased )
 	{
-		thread announceGameWinner( winner, level.postRoundTime / 2 );
+		thread maps\mp\gametypes\_globallogic::announceGameWinner( winner, level.postRoundTime / 2 );
 		
 		if ( level.splitscreen )
 		{
@@ -404,22 +546,25 @@ endGameFK( winner, endReasonText  )
 			}
 		}
 	}
-	
-	roundEndWait( level.postRoundTime, true );
-   
-    //Final Killcam
+    
+    wait 9;
+    
     if(level.players.size > 0 && level.gametype != "sd")
     {
         level.killcam_style = 0;
-        
-        FinalKillcamTeam( winner );
-        
-        if(level.showingFinalKillcam)
-            level waittill("end_killcam");
-        
-        
-        level.showingFinalKillcam = false;
+        thread startFK( winner );
     }
+    
+    if(level.gametype == "sd" && maps\mp\gametypes\_globallogic::hitScoreLimit() && level.players.size > 0)
+    {
+        level.killcam_style = 0;
+        thread startFK( winner );
+    }
+    
+    if(level.fk)
+        level waittill("end_killcam");
+	else
+        maps\mp\gametypes\_globallogic::roundEndWait( level.postRoundTime, true );
 	
 	level.intermission = true;
 	
@@ -432,7 +577,7 @@ endGameFK( winner, endReasonText  )
 		player closeMenu();
 		player closeInGameMenu();
 		player notify ( "reset_outcome" );
-		player thread spawnIntermission();
+		player thread maps\mp\gametypes\_globallogic::spawnIntermission();
 		player setClientDvar( "ui_hud_hardcore", 0 );
 		player setclientdvar( "g_scriptMainMenu", game["menu_eog_main"] );
 	}
@@ -471,17 +616,58 @@ endGameFK( winner, endReasonText  )
 	exitLevel( false );
 }
 
-FinalKillcamTeam( winner )
+timeLimitClock_Intermission( waitTime )
 {
-    level.winner = winner;
+	setGameEndTime( getTime() + int(waitTime*1000) );
+	clockObject = spawn( "script_origin", (0,0,0) );
+	
+	if ( waitTime >= 10.0 )
+		wait ( waitTime - 10.0 );
+		
+	for ( ;; )
+	{
+		clockObject playSound( "ui_mp_timer_countdown" );
+		wait ( 1.0 );
+	}	
+}
 
-    if(!level.finalkillcam)
+startFK( winner )
+{
+    level endon("end_killcam");
+    
+    if(!level.showFinalKillcam)
         return;
     
-    level.showingFinalKillcam = true;
+    if(!isPlayer(Winner) && !level.doFK[winner])
+        return;
     
-    for( i = 0; i < level.players.size; i++)
+    level.fk = true;
+    
+    for( i = 0; i < level.players.size; i ++)
     {
-        level.players[i] notify("begin_FK");
+        player = level.players[i];
+        
+        player notify("beginFK", winner);
     }
+    
+    slowMotion();
+
+}
+
+slowMotion()
+{
+    while(!isDefined(level.slowmostart))
+        wait 0.05;
+    
+    wait level.slowmostart;
+    
+    SetDvar("timescale", ".3");
+    for(i=0;i<level.players.size;i++)
+        level.players[i] setclientdvar("timescale", ".3");
+    
+    wait 1.7;
+    
+    SetDvar("timescale", "1");
+    for(i=0;i<level.players.size;i++)
+        level.players[i] setclientdvar("timescale", "1");
 }
