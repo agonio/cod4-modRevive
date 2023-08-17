@@ -1,17 +1,19 @@
 init()
 {
+    setDvar( "add_bots", 0 );
+    
     thread precache();
     thread onPlayerConnect();
 
     for(;;)
     {
-        if(getdvarInt("scr_testclients") > 0)
+        if(getdvarInt("add_bots") > 0)
             break;
         wait 1;
     }
     
-    testclients = getdvarInt("scr_testclients");
-    setDvar( "scr_testclients", 0 );
+    testclients = getdvarInt("add_bots");
+    setDvar( "add_bots", 0 );
     
     for(i = 0; i < testclients; i++)
     {
@@ -28,8 +30,7 @@ init()
 
 precache()
 {
-    precacheMenu("commands");
-    precacheMenu("bot_walk");
+
 }
 TestClient(team)
 {

@@ -58,10 +58,9 @@ main()
 
 	level.onStartGameType = ::onStartGameType;
 	level.onSpawnPlayer = ::onSpawnPlayer;
-    
+    level.onPlayerKilled = ::onPlayerKilled;
     level.onTimeLimit = ::default_onTimeLimit;
 	level.onScoreLimit = ::default_onScoreLimit;
-   level.onPlayerKilled = ::onPlayerKilled;
 
 	game["dialog"]["gametype"] = "freeforall";
 }
@@ -115,11 +114,6 @@ onStartGameType()
 	}
 }
 
-onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
-{
-   thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
-}
-
 default_onTimeLimit()
 {
 	winner = undefined;
@@ -149,7 +143,7 @@ default_onTimeLimit()
 	makeDvarServerInfo( "ui_text_endreason", game["strings"]["time_limit_reached"] );
 	setDvar( "ui_text_endreason", game["strings"]["time_limit_reached"] );
 	
-	thread maps\mp\gametypes\_finalkillcam::endGameFK( winner, game["strings"]["time_limit_reached"] );
+	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["time_limit_reached"] );
 }
 
 default_onScoreLimit()
@@ -182,7 +176,7 @@ default_onScoreLimit()
 	setDvar( "ui_text_endreason", game["strings"]["score_limit_reached"] );
 	
 	level.forcedEnd = true; // no more rounds if scorelimit is hit
-	thread maps\mp\gametypes\_finalkillcam::endGameFK( winner, game["strings"]["score_limit_reached"] );
+	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["score_limit_reached"] );
 }
 
 onSpawnPlayer()
@@ -193,6 +187,10 @@ onSpawnPlayer()
 	self spawn( spawnPoint.origin, spawnPoint.angles );
 }
 
+onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
+{
+   thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
+}
 
 onEndGame( winningPlayer )
 {

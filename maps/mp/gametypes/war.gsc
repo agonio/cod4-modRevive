@@ -68,83 +68,13 @@ main()
 	level.teamBased = true;
 	level.onStartGameType = ::onStartGameType;
 	level.onSpawnPlayer = ::onSpawnPlayer;
-   
-	level.onTimeLimit = ::default_onTimeLimit;
+    
+    level.onTimeLimit = ::default_onTimeLimit;
 	level.onScoreLimit = ::default_onScoreLimit;
-   level.onPlayerKilled = ::onPlayerKilled;
+    level.onPlayerKilled = ::onPlayerKilled;
 
 	game["dialog"]["gametype"] = "team_deathmtch";
 }
-
-onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
-{
-   thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
-}
-default_onTimeLimit()
-{
-	winner = undefined;
-	
-	if ( level.teamBased )
-	{
-		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
-			winner = "tie";
-		else if ( game["teamScores"]["axis"] > game["teamScores"]["allies"] )
-			winner = "axis";
-		else
-			winner = "allies";
-
-		logString( "time limit, win: " + winner + ", allies: " + game["teamScores"]["allies"] + ", opfor: " + game["teamScores"]["axis"] );
-	}
-	else
-	{
-		winner = maps\mp\gametypes\_globallogic::getHighestScoringPlayer();
-
-		if ( isDefined( winner ) )
-			logString( "time limit, win: " + winner.name );
-		else
-			logString( "time limit, tie" );
-	}
-	
-	// i think these two lines are obsolete
-	makeDvarServerInfo( "ui_text_endreason", game["strings"]["time_limit_reached"] );
-	setDvar( "ui_text_endreason", game["strings"]["time_limit_reached"] );
-	
-	thread maps\mp\gametypes\_finalkillcam::endGameFK( winner, game["strings"]["time_limit_reached"] );
-}
-
-default_onScoreLimit()
-{
-	if ( !level.endGameOnScoreLimit )
-		return;
-
-	winner = undefined;
-	
-	if ( level.teamBased )
-	{
-		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
-			winner = "tie";
-		else if ( game["teamScores"]["axis"] > game["teamScores"]["allies"] )
-			winner = "axis";
-		else
-			winner = "allies";
-		logString( "scorelimit, win: " + winner + ", allies: " + game["teamScores"]["allies"] + ", opfor: " + game["teamScores"]["axis"] );
-	}
-	else
-	{
-		winner = maps\mp\gametypes\_globallogic::getHighestScoringPlayer();
-		if ( isDefined( winner ) )
-			logString( "scorelimit, win: " + winner.name );
-		else
-			logString( "scorelimit, tie" );
-	}
-	
-	makeDvarServerInfo( "ui_text_endreason", game["strings"]["score_limit_reached"] );
-	setDvar( "ui_text_endreason", game["strings"]["score_limit_reached"] );
-	
-	level.forcedEnd = true; // no more rounds if scorelimit is hit
-	thread maps\mp\gametypes\_finalkillcam::endGameFK( winner, game["strings"]["score_limit_reached"] );
-}
-
 
 onStartGameType()
 {
@@ -223,9 +153,78 @@ onSpawnPlayer()
 	self spawn( spawnPoint.origin, spawnPoint.angles );
 }
 
+default_onTimeLimit()
+{
+	winner = undefined;
+	
+	if ( level.teamBased )
+	{
+		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
+			winner = "tie";
+		else if ( game["teamScores"]["axis"] > game["teamScores"]["allies"] )
+			winner = "axis";
+		else
+			winner = "allies";
+
+		logString( "time limit, win: " + winner + ", allies: " + game["teamScores"]["allies"] + ", opfor: " + game["teamScores"]["axis"] );
+	}
+	else
+	{
+		winner = maps\mp\gametypes\_globallogic::getHighestScoringPlayer();
+
+		if ( isDefined( winner ) )
+			logString( "time limit, win: " + winner.name );
+		else
+			logString( "time limit, tie" );
+	}
+	
+	// i think these two lines are obsolete
+	makeDvarServerInfo( "ui_text_endreason", game["strings"]["time_limit_reached"] );
+	setDvar( "ui_text_endreason", game["strings"]["time_limit_reached"] );
+	
+	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["time_limit_reached"] );
+}
+
+default_onScoreLimit()
+{
+	if ( !level.endGameOnScoreLimit )
+		return;
+
+	winner = undefined;
+	
+	if ( level.teamBased )
+	{
+		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
+			winner = "tie";
+		else if ( game["teamScores"]["axis"] > game["teamScores"]["allies"] )
+			winner = "axis";
+		else
+			winner = "allies";
+		logString( "scorelimit, win: " + winner + ", allies: " + game["teamScores"]["allies"] + ", opfor: " + game["teamScores"]["axis"] );
+	}
+	else
+	{
+		winner = maps\mp\gametypes\_globallogic::getHighestScoringPlayer();
+		if ( isDefined( winner ) )
+			logString( "scorelimit, win: " + winner.name );
+		else
+			logString( "scorelimit, tie" );
+	}
+	
+	makeDvarServerInfo( "ui_text_endreason", game["strings"]["score_limit_reached"] );
+	setDvar( "ui_text_endreason", game["strings"]["score_limit_reached"] );
+	
+	level.forcedEnd = true; // no more rounds if scorelimit is hit
+	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["score_limit_reached"] );
+}
 
 onEndGame( winningTeam )
 {
 	if ( isdefined( winningTeam ) && (winningTeam == "allies" || winningTeam == "axis") )
 		[[level._setTeamScore]]( winningTeam, [[level._getTeamScore]]( winningTeam ) + 1 );	
+}
+
+onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
+{
+   thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
 }
