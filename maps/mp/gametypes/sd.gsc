@@ -362,7 +362,7 @@ checkAllowSpectating()
 
 sd_endGame( winningTeam, endReasonText )
 {
-    thread maps\mp\gametypes\_finalkillcam::endGame( winningTeam, endReasonText );
+	thread maps\mp\gametypes\_finalkillcam::endGame( winningTeam, endReasonText );
 }
 
 
@@ -690,9 +690,9 @@ onDrop( player )
 
 //		maps\mp\gametypes\_globallogic::leaderDialog( "bomb_lost", player.pers["team"] );
 		if ( isDefined( player ) )
-		 	player logString( "bomb dropped" );
+			player logString( "bomb dropped" );
 		 else
-		 	logString( "bomb dropped" );
+			logString( "bomb dropped" );
 	}
 
 	self maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "waypoint_bomb" );

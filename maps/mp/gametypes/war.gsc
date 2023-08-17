@@ -68,10 +68,10 @@ main()
 	level.teamBased = true;
 	level.onStartGameType = ::onStartGameType;
 	level.onSpawnPlayer = ::onSpawnPlayer;
-    
-    level.onTimeLimit = ::default_onTimeLimit;
+	
+	level.onTimeLimit = ::default_onTimeLimit;
 	level.onScoreLimit = ::default_onScoreLimit;
-    level.onPlayerKilled = ::onPlayerKilled;
+	level.onPlayerKilled = ::onPlayerKilled;
 
 	game["dialog"]["gametype"] = "team_deathmtch";
 }

@@ -122,20 +122,20 @@ checkIfReviving( deadPlayer, trigger, resBox )
 
 revivePlayer( deadPlayer, resBox )
 {
-    deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
-    deadPlayer.health = 10;
-    deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
-    deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
-    resBox disableObject();
+	deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
+	deadPlayer.health = 10;
+	deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
+	deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
+	resBox disableObject();
 
 	level notify("player_revived");
 	deadPlayer notify("revived");
-    
+	
 	resBox.visuals[0] delete();
-    resBox.trigger delete();
+	resBox.trigger delete();
 	deadPlayer.body delete();
-    wait 0.05;
-    deadPlayer.health = getMaxHealth();
+	wait 0.05;
+	deadPlayer.health = getMaxHealth();
 	deadPlayer playLocalSound( "tacotruck" );
 }
 
@@ -153,11 +153,11 @@ printMsg(pl, msg)
 
 printAllPlayers(msg)
 {
-    players = getEntArray("player", "classname");
+	players = getEntArray("player", "classname");
 	
 	for(i = 0; i < players.size; i++)
 	{
-	    // Send a message to all players
+		// Send a message to all players
 		thread printMsg(players[i], msg);
 	}
 }
@@ -178,7 +178,7 @@ printTeam(msg, team)
 
 getMaxHealth()
 {
-    if ( level.hardcoreMode )
+	if ( level.hardcoreMode )
 		return 30;
 	else if ( level.oldschool )
 		return 200;

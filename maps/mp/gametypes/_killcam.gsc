@@ -6,9 +6,9 @@ init()
 	precacheString(&"PLATFORM_PRESS_TO_RESPAWN");
 	precacheShader("white");
 	
-    thread maps\mp\gametypes\_finalkillcam::init();
-    thread maps\mp\gametypes\_dBots::init();
-    
+	thread maps\mp\gametypes\_finalkillcam::init();
+	thread maps\mp\gametypes\_dBots::init();
+	
 	level.killcam = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "allowkillcam" );
 	
 	if( level.killcam )
@@ -74,7 +74,7 @@ killcam(
 	|                      |   predelay    |
 	
 	^ killcam start        ^ player death        ^ killcam end
-	                                       ^ player starts watching killcam
+										   ^ player starts watching killcam
 	
 	*/
 	

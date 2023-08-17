@@ -29,7 +29,7 @@ maps\mp\gametypes\_perplayer::disable(objectiveCreator);
 // set id to be some unique string indicating the purpose of the callbacks.
 init(id, playerBeginCallback, playerEndCallback)
 {
-    //thread maps\mp\gametypes\_addons::init();
+	//thread maps\mp\gametypes\_addons::init();
 	precacheShader("objpoint_default");
 	
 	handler = spawnstruct();
@@ -43,7 +43,7 @@ init(id, playerBeginCallback, playerEndCallback)
 	
 	level.handlerGlobalFlagVal = 0;
 	
-    
+	
 	return handler;
 }
 

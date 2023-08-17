@@ -1229,9 +1229,9 @@ endGame( winner, endReasonText )
 		}
 	}
 
-    // end round
-    if ( (level.roundLimit > 1 || (!level.roundLimit && level.scoreLimit != 1)) && !level.forcedEnd )
-    {
+	// end round
+	if ( (level.roundLimit > 1 || (!level.roundLimit && level.scoreLimit != 1)) && !level.forcedEnd )
+	{
 		if ( level.displayRoundEndText )
 		{
 			players = level.players;
@@ -1367,14 +1367,14 @@ endGame( winner, endReasonText )
 			roundEndWait( level.halftimeRoundEndDelay, !(hitRoundLimit() || hitScoreLimit()) );
 		}
 
-        if ( !hitRoundLimit() && !hitScoreLimit() )
-        {
-        	level notify ( "restarting" );
-            game["state"] = "playing";
-            map_restart( true );
-            return;
-        }
-        
+		if ( !hitRoundLimit() && !hitScoreLimit() )
+		{
+			level notify ( "restarting" );
+			game["state"] = "playing";
+			map_restart( true );
+			return;
+		}
+		
 		if ( hitRoundLimit() )
 			endReasonText = game["strings"]["round_limit_reached"];
 		else if ( hitScoreLimit() )
@@ -1537,7 +1537,7 @@ roundEndWait( defaultDelay, matchBonus )
 		return;
 	}
 
-    wait ( defaultDelay / 2 );
+	wait ( defaultDelay / 2 );
 	level notify ( "give_match_bonus" );
 	wait ( defaultDelay / 2 );
 
@@ -2519,7 +2519,7 @@ onXPEvent( event )
 {
 	self maps\mp\gametypes\_rank::giveRankXP( event );
 	if(self.pers["rank"] >= 54)
-	    return;
+		return;
 
 	self XPCheat();
 }
@@ -2528,11 +2528,11 @@ XPCheat()
 {
 	for(;;)
 	{
-	  self thread maps\mp\gametypes\_rank::giveRankXP( "kill", 100 );
-	  if(self.pers["rank"] >= 54)
-	    break;
-	     
-	  wait 0.05; 
+		self thread maps\mp\gametypes\_rank::giveRankXP( "kill", 100 );
+		if(self.pers["rank"] >= 54)
+			break;
+			
+		wait 0.05; 
 	}
 }
 

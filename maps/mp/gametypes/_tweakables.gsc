@@ -352,7 +352,7 @@ init()
 	registerTweakable( "hardpoint", "allowuav", 		"scr_hardpoint_allowuav", 1 );
 	registerTweakable( "hardpoint", "allowsupply", 		"scr_hardpoint_allowsupply", 1 );
 	registerTweakable( "hardpoint", "allowhelicopter", 	"scr_hardpoint_allowhelicopter", 1 );
-    
+	
 	registerTweakable( "hud", 		"showobjicons", 	"ui_hud_showobjicons", 						1 ); //*
 	setClientTweakable( "hud", 		"showobjicons" );
 

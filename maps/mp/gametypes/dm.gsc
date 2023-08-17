@@ -58,8 +58,8 @@ main()
 
 	level.onStartGameType = ::onStartGameType;
 	level.onSpawnPlayer = ::onSpawnPlayer;
-    level.onPlayerKilled = ::onPlayerKilled;
-    level.onTimeLimit = ::default_onTimeLimit;
+	level.onPlayerKilled = ::onPlayerKilled;
+	level.onTimeLimit = ::default_onTimeLimit;
 	level.onScoreLimit = ::default_onScoreLimit;
 
 	game["dialog"]["gametype"] = "freeforall";

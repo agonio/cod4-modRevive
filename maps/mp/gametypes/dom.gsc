@@ -88,7 +88,7 @@ main()
 	level.onSpawnPlayer = ::onSpawnPlayer;
 	level.onPlayerKilled = ::onPlayerKilled;
 	level.onPrecacheGameType = ::onPrecacheGameType;
-    level.onTimeLimit = ::default_onTimeLimit;
+	level.onTimeLimit = ::default_onTimeLimit;
 	level.onScoreLimit = ::default_onScoreLimit;
 
 	game["dialog"]["gametype"] = "domination";
@@ -639,8 +639,8 @@ updateDomScores()
 
 onPlayerKilled( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration )
 {
-    thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
-    
+	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
+	
 	if ( self.touchTriggers.size && isPlayer( attacker ) && attacker.pers["team"] != self.pers["team"] )
 	{
 		triggerIds = getArrayKeys( self.touchTriggers );
