@@ -6,7 +6,6 @@
 setup()
 {
 	thread watchRevives();
-	thread watchRounds();
 	thread watchPrematch();
 }
 
@@ -14,15 +13,6 @@ watchPrematch() {
 	level endon("game_ended");
 	for(;;) {
 		level waittill("prematch_over");
-		printAliveCount();
-	}
-}
-
-watchRounds() {
-	level endon("game_ended");
-	for(;;) {
-		level waittill("round_switch");
-		wait 2; // delay print, as players don't seem to be setup already
 		printAliveCount();
 	}
 }
@@ -143,6 +133,7 @@ revivePlayer( deadPlayer, resBox )
     
 	resBox.visuals[0] delete();
     resBox.trigger delete();
+	deadPlayer.body delete();
     wait 0.05;
     deadPlayer.health = getMaxHealth();
 	deadPlayer playLocalSound( "tacotruck" );

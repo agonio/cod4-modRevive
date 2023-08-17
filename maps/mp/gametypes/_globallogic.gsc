@@ -3749,10 +3749,14 @@ Callback_StartGameType()
 		
 		game["teamScores"]["allies"] = 0;
 		game["teamScores"]["axis"] = 0;
-		
-		// first round, so set up prematch
+		// match start: set up prematch
 		level.prematchPeriod = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "playerwaittime" );
 		level.prematchPeriodEnd = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "matchstarttime" );
+		
+	} else {
+		// every round set up prematch
+		level.prematchPeriod = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "playerwaittime" );
+		level.prematchPeriodEnd = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "roundstarttime" );
 	}
 	
 	if(!isdefined(game["timepassed"]))
