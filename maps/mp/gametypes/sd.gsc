@@ -224,7 +224,7 @@ getBetterTeam()
 }
 
 onStartGameType()
-{	
+{
 	if ( !isDefined( game["switchedsides"] ) )
 		game["switchedsides"] = false;
 	
@@ -333,8 +333,10 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 {
 	thread checkAllowSpectating();
 
-    // **** custom code below *****
+	// **** custom code below *****
 	self thread maps\mp\gametypes\revive::checkRevive(attacker, sMeansOfDeath);
+
+   	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
 }
 
 
@@ -360,10 +362,7 @@ checkAllowSpectating()
 
 sd_endGame( winningTeam, endReasonText )
 {
-	if ( isdefined( winningTeam ) )
-		[[level._setTeamScore]]( winningTeam, [[level._getTeamScore]]( winningTeam ) + 1 );
-	
-	thread maps\mp\gametypes\_globallogic::endGame( winningTeam, endReasonText );
+    thread maps\mp\gametypes\_finalkillcam::endGameFK( winningTeam, endReasonText );
 }
 
 
