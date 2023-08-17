@@ -6,8 +6,8 @@ is a mod for `search&destroy` adding a revive mechanic. It has the following fea
   - a new round started,
   - a player was killed,
   - a player was revived.
+- integrated the [Final Killcam](https://www.moddb.com/mods/final-killcam) mod created by [FzBr.d4rk](https://www.moddb.com/members/fzbrd4rk) ©
 
-The mod is based on modwarfare and therefor allows all loadouts from the beginning.
 
 
 ## Setup
@@ -27,11 +27,13 @@ These files should be generated/updated:
 
 ## Run / Test
 
-To run the game with the mod, create a shortcut to the mp bin with following parameters: 
+To run the game with the mod, e.g. create a shortcut to the mp bin with following parameters: 
 
 `"<path_to_iw3mp.exe>" +set developer 1 +set fs_game mods/ModRevive`
 
 In the game launch a server with the `sd` gamemode.
+
+For local testing the Final Killcam mod offers the possibility to add Bots. Open console and type `/add_bots X` (X = amount)
 
 ## Useful links
 
