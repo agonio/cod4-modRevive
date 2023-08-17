@@ -661,11 +661,11 @@ slowMotion()
     
     wait level.slowmostart;
     
-    SetDvar("timescale", ".3");
+    SetDvar("timescale", ".5");
     for(i=0;i<level.players.size;i++)
-        level.players[i] setclientdvar("timescale", ".3");
+        level.players[i] setclientdvar("timescale", ".5");
     
-    wait 1.7;
+    wait 1.2;
     
     SetDvar("timescale", "1");
     for(i=0;i<level.players.size;i++)
