@@ -595,8 +595,10 @@ spawnPlayer()
 		self.maxhealth = 30;
 	else if ( level.oldschool )
 		self.maxhealth = 200;
-	else
-		self.maxhealth = 100;
+	else {
+		healthTweak = maps\mp\gametypes\_tweakables::getTweakableValue("player", "maxhealth");
+		self.maxhealth = healthTweak;
+	}
 	self.health = self.maxhealth;
 	
 	self.friendlydamage = undefined;

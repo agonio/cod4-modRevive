@@ -82,7 +82,10 @@ checkIfReviving( deadPlayer, trigger, resBox )
 	barData.inUse = false;
 	barData.useRate = 1;
 	barData.curProgress = 0;
-	barData.useTime = 3000;
+
+	baseTime = maps\mp\gametypes\_tweakables::getTweakableValue("player", "revivetime"); // default 3000 ms
+	increase = maps\mp\gametypes\_tweakables::getTweakableValue("player", "revivetimeincrease"); // default 1000 ms
+	barData.useTime = baseTime + deadPlayer.reviveCount * increase;
 
 	text = createFontString( "objective", 1.5 );
 	text setPoint("CENTER", undefined, level.primaryProgressBarTextX, level.primaryProgressBarTextY);
@@ -123,6 +126,7 @@ checkIfReviving( deadPlayer, trigger, resBox )
 revivePlayer( deadPlayer, resBox )
 {
 	deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
+	deadPlayer.reviveCount++;
 	deadPlayer.health = 10;
 	deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
 	deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
@@ -182,6 +186,8 @@ getMaxHealth()
 		return 30;
 	else if ( level.oldschool )
 		return 200;
-	else
-		return 100;
+	else {
+		healthTweak = maps\mp\gametypes\_tweakables::getTweakableValue("player", "maxhealth");
+		return healthTweak;
+	}
 }

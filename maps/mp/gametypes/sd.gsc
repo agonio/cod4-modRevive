@@ -293,6 +293,9 @@ onStartGameType()
 
 onSpawnPlayer()
 {
+	if (!isdefined(self.reviveCount)) {
+		self.reviveCount = 0; //each round
+	}
 	self.checkingBody = false;
 	self.isPlanting = false;
 	self.isDefusing = false;
@@ -336,7 +339,7 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 	// **** custom code below *****
 	self thread maps\mp\gametypes\revive::checkRevive(attacker, sMeansOfDeath);
 
-   thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
+	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
 }
 
 
