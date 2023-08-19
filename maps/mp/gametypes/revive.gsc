@@ -5,6 +5,8 @@
 
 setup()
 {
+	precacheShader("revive_icon");
+
 	thread watchRevives();
 	thread watchPrematch();
 }
@@ -44,7 +46,7 @@ checkRevive(attacker, sMeansOfDeath)
 		resBox allowUse( "friendly" );
 		resBox setUseTime( 0 );
 		resBox set2DIcon( "friendly", "compass_waypoint_defend" );
-		resBox set3DIcon( "friendly", "compass_waypoint_defend" );
+		resBox set3DIcon( "friendly", "revive_icon" );
 		resBox setVisibleTeam( "friendly" );
 
 		self thread monitorBody(trigger, resBox);
