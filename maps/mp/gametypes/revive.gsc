@@ -36,7 +36,6 @@ checkRevive(attacker, sMeansOfDeath)
 	// wait for body's final position
 	wait(1.5);
 
-	visuals[0] = spawn( "script_model", self.body.origin );
 	trigger = spawn( "trigger_radius", self.body.origin, 0, 45 , 45 );
 
 	team = self.pers["team"];
@@ -44,6 +43,13 @@ checkRevive(attacker, sMeansOfDeath)
 	{
 		resObjective = maps\mp\gametypes\_objpoints::createTeamObjpoint( "revive_"+ self.name, self.body.origin + (0,0,32), team, "revive_icon" );
 		resObjective setWayPoint(true, "revive_icon");
+
+		objId = getNextObjID(); // starts with 6, so we have 10 objIds free
+		printMsg(self, "objId = "+ objId);
+		if (objId < 16) {
+			objective_add(objId, "active", self.body.origin);
+			objective_icon(objId, "revive_icon");
+		}
 
 		self thread monitorBody(trigger, resObjective);
 	}
@@ -108,7 +114,9 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 
 		if (barData.curProgress >= barData.useTime) {
 			wait (0.05);
-			revivePlayer(deadPlayer, resObjective);
+			revivePlayer(deadPlayer);
+			trigger delete();
+			maps\mp\gametypes\_objpoints::deleteObjPoint(resObjective);
 			break;
 		}
 	}
@@ -121,7 +129,7 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 	}
 }
 
-revivePlayer( deadPlayer, resObjective )
+revivePlayer( deadPlayer )
 {
 	deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
 	deadPlayer.reviveCount++;
@@ -132,7 +140,6 @@ revivePlayer( deadPlayer, resObjective )
 	level notify("player_revived");
 	deadPlayer notify("revived");
 
-	maps\mp\gametypes\_objpoints::deleteObjPoint(resObjective);
 	deadPlayer.body delete();
 	wait 0.05;
 	deadPlayer.health = getMaxHealth();
