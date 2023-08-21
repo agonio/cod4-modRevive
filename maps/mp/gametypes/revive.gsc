@@ -45,7 +45,7 @@ checkRevive(attacker, sMeansOfDeath)
 		resBox = createUseObject( team, trigger, visuals, (0,0,32) );
 		resBox allowUse( "friendly" );
 		resBox setUseTime( 0 );
-		resBox set2DIcon( "friendly", "compass_waypoint_defend" );
+		resBox set2DIcon( "friendly", "revive_icon" );
 		resBox set3DIcon( "friendly", "revive_icon" );
 		resBox setVisibleTeam( "friendly" );
 
