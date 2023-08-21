@@ -92,7 +92,7 @@ onStartGameType()
 	maps\mp\gametypes\_spawnlogic::addSpawnPoints( "axis", "mp_dm_spawn" );
 	level.mapCenter = maps\mp\gametypes\_spawnlogic::findBoxCenter( level.spawnMins, level.spawnMaxs );
 	setMapCenter( level.mapCenter );
-	
+
 	allowed[0] = "dm";
 	maps\mp\gametypes\_gameobjects::main(allowed);
 
@@ -101,7 +101,7 @@ onStartGameType()
 	maps\mp\gametypes\_rank::registerScoreInfo( "assist", 1 );
 	maps\mp\gametypes\_rank::registerScoreInfo( "suicide", 0 );
 	maps\mp\gametypes\_rank::registerScoreInfo( "teamkill", 0 );
-	
+
 	level.displayRoundEndText = false;
 	level.QuickMessageToAll = true;
 
@@ -117,7 +117,7 @@ onStartGameType()
 default_onTimeLimit()
 {
 	winner = undefined;
-	
+
 	if ( level.teamBased )
 	{
 		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
@@ -138,11 +138,11 @@ default_onTimeLimit()
 		else
 			logString( "time limit, tie" );
 	}
-	
+
 	// i think these two lines are obsolete
 	makeDvarServerInfo( "ui_text_endreason", game["strings"]["time_limit_reached"] );
 	setDvar( "ui_text_endreason", game["strings"]["time_limit_reached"] );
-	
+
 	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["time_limit_reached"] );
 }
 
@@ -152,7 +152,7 @@ default_onScoreLimit()
 		return;
 
 	winner = undefined;
-	
+
 	if ( level.teamBased )
 	{
 		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
@@ -171,10 +171,10 @@ default_onScoreLimit()
 		else
 			logString( "scorelimit, tie" );
 	}
-	
+
 	makeDvarServerInfo( "ui_text_endreason", game["strings"]["score_limit_reached"] );
 	setDvar( "ui_text_endreason", game["strings"]["score_limit_reached"] );
-	
+
 	level.forcedEnd = true; // no more rounds if scorelimit is hit
 	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["score_limit_reached"] );
 }
@@ -195,5 +195,5 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 onEndGame( winningPlayer )
 {
 	if ( isDefined( winningPlayer ) )
-		[[level._setPlayerScore]]( winningPlayer, winningPlayer [[level._getPlayerScore]]() + 1 );	
+		[[level._setPlayerScore]]( winningPlayer, winningPlayer [[level._getPlayerScore]]() + 1 );
 }

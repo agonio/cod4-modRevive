@@ -5,7 +5,7 @@ init()
 {
 	// assigns weapons with stat numbers from 0-149
 	// attachments are now shown here, they are per weapon settings instead
-	
+
 	// generating weaponIDs array
 	level.weaponIDs = [];
 	max_weapon_num = 149;
@@ -19,16 +19,16 @@ init()
 			continue;
 		}
 		level.weaponIDs[i] = weapon_name + "_mp";
-		
+
 		// generating attachment combinations
 		attachment = tablelookup( "mp/statstable.csv", 0, i, 8 );
 		if( !isdefined( attachment ) || attachment == "" )
 			continue;
-			
+
 		attachment_tokens = strtok( attachment, " " );
 		if( !isdefined( attachment_tokens ) )
 			continue;
-			
+
 		if( attachment_tokens.size == 0 )
 		{
 			level.weaponIDs[attachment_num] = weapon_name + "_" + attachment + "_mp";
@@ -50,10 +50,10 @@ init()
 	{
 		if ( !isdefined( level.weaponIDs[index] ) || level.weaponIDs[index] == "" )
 			continue;
-			
+
 		level.weaponNames[level.weaponIDs[index]] = index;
 	}
-	
+
 	// generating weaponlist array
 	level.weaponlist = [];
 	assertex( isdefined( level.weaponIDs.size ), "level.weaponIDs is corrupted" );
@@ -69,15 +69,15 @@ init()
 	for ( index = 0; index < level.weaponList.size; index++ )
 	{
 		precacheItem( level.weaponList[index] );
-		println( "Precached weapon: " + level.weaponList[index] );	
+		println( "Precached weapon: " + level.weaponList[index] );
 	}
 
 	precacheItem( "frag_grenade_short_mp" );
-	
-	precacheItem( "destructible_car" );	
-	
+
+	precacheItem( "destructible_car" );
+
 	precacheModel( "weapon_rpg7_stow" );
-	
+
 	precacheShellShock( "default" );
 	precacheShellShock( "concussion_grenade_mp" );
 //	thread maps\mp\_pipebomb::main();
@@ -91,12 +91,12 @@ init()
 	level.claymoreDetectionMinDist = 20;
 	level.claymoreDetectionGracePeriod = .75;
 	level.claymoreDetonateRadius = 192;
-	
+
 	level.C4FXid = loadfx( "misc/light_c4_blink" );
 	level.claymoreFXid = loadfx( "misc/claymore_laser" );
-	
+
 	level thread onPlayerConnect();
-	
+
 	level.c4explodethisframe = false;
 }
 
@@ -126,10 +126,10 @@ onPlayerSpawned()
 		self thread watchWeaponUsage();
 		self thread watchGrenadeUsage();
 		self thread watchWeaponChange();
-		
+
 		self.droppedDeathWeapon = undefined;
 		self.tookWeaponFrom = [];
-		
+
 		self thread updateStowedWeapon();
 	}
 }
@@ -138,13 +138,13 @@ watchWeaponChange()
 {
 	self endon("death");
 	self endon("disconnect");
-	
+
 	self.lastDroppableWeapon = self getCurrentWeapon();
-	
+
 	while(1)
 	{
 		self waittill( "weapon_change", newWeapon );
-		
+
 		if ( mayDropWeapon( newWeapon ) )
 			self.lastDroppableWeapon = newWeapon;
 	}
@@ -187,27 +187,27 @@ mayDropWeapon( weapon )
 {
 	if ( weapon == "none" )
 		return false;
-		
+
 	if ( isHackWeapon( weapon ) )
 		return false;
-	
+
 	invType = WeaponInventoryType( weapon );
 	if ( invType != "primary" )
 		return false;
-	
+
 	if ( weapon == "none" )
 		return false;
-	
+
 	return true;
 }
 
 dropWeaponForDeath( attacker )
 {
 	weapon = self.lastDroppableWeapon;
-	
+
 	if ( isdefined( self.droppedDeathWeapon ) )
 		return;
-	
+
 	if ( !isdefined( weapon ) )
 	{
 		/#
@@ -216,7 +216,7 @@ dropWeaponForDeath( attacker )
 		#/
 		return;
 	}
-	
+
 	if ( weapon == "none" )
 	{
 		/#
@@ -225,7 +225,7 @@ dropWeaponForDeath( attacker )
 		#/
 		return;
 	}
-	
+
 	if ( !self hasWeapon( weapon ) )
 	{
 		/#
@@ -234,7 +234,7 @@ dropWeaponForDeath( attacker )
 		#/
 		return;
 	}
-	
+
 	if ( !(self AnyAmmoForWeaponModes( weapon )) )
 	{
 		/#
@@ -243,7 +243,7 @@ dropWeaponForDeath( attacker )
 		#/
 		return;
 	}
-	
+
 	clipAmmo = self GetWeaponAmmoClip( weapon );
 	if ( !clipAmmo )
 	{
@@ -264,25 +264,25 @@ dropWeaponForDeath( attacker )
 	if ( getdvar("scr_dropdebug") == "1" )
 		println( "dropped weapon: " + weapon );
 	#/
-	
+
 	self.droppedDeathWeapon = true;
 	self.droppedDeathItem = item;
 
 	item ItemWeaponSetAmmo( clipAmmo, stockAmmo );
 	item itemRemoveAmmoFromAltModes();
-	
+
 	item.owner = self;
 	item.ownersattacker = attacker;
-	
+
 	item thread watchPickup();
-	
+
 	item thread deletePickupAfterAWhile();
 }
 
 deletePickupAfterAWhile()
 {
 	self endon("death");
-	
+
 	wait 60;
 
 	if ( !isDefined( self ) )
@@ -302,25 +302,25 @@ getItemWeaponName()
 watchPickup()
 {
 	self endon("death");
-	
+
 	weapname = self getItemWeaponName();
-	
+
 	while(1)
 	{
 		self waittill( "trigger", player, droppedItem );
-		
+
 		if ( isdefined( droppedItem ) )
 			break;
 		// otherwise, player merely acquired ammo and didn't pick this up
 	}
-	
+
 	/#
 	if ( getdvar("scr_dropdebug") == "1" )
 		println( "picked up weapon: " + weapname + ", " + isdefined( self.ownersattacker ) );
 	#/
 
 	assert( isdefined( player.tookWeaponFrom ) );
-	
+
 	// make sure the owner information on the dropped item is preserved
 	droppedWeaponName = droppedItem getItemWeaponName();
 	if ( isdefined( player.tookWeaponFrom[ droppedWeaponName ] ) )
@@ -337,7 +337,7 @@ watchPickup()
 	self.owner.droppedDeathItem = droppedItem;
 
 	droppedItem thread watchPickup();
-	
+
 	// take owner information from self and put it onto player
 	if ( isdefined( self.ownersattacker ) && self.ownersattacker == player )
 	{
@@ -352,9 +352,9 @@ watchPickup()
 itemRemoveAmmoFromAltModes()
 {
 	origweapname = self getItemWeaponName();
-	
+
 	curweapname = weaponAltWeaponName( origweapname );
-	
+
 	altindex = 1;
 	while ( curweapname != "none" && curweapname != origweapname )
 	{
@@ -378,12 +378,12 @@ dropOffhand()
 	{
 		if ( !self hasWeapon( grenadeTypes[index] ) )
 			continue;
-			
+
 		count = self getAmmoCount( grenadeTypes[index] );
-		
+
 		if ( !count )
 			continue;
-			
+
 		self dropItem( grenadeTypes[index] );
 	}
 }
@@ -420,17 +420,17 @@ watchWeaponUsage()
 	self endon( "death" );
 	self endon( "disconnect" );
 	level endon ( "game_ended" );
-	
+
 	self.firingWeapon = false;
-	
+
 	for ( ;; )
-	{	
+	{
 		self waittill ( "begin_firing" );
 		self.hasDoneCombat = true;
-		self.firingWeapon = true;	
-		
+		self.firingWeapon = true;
+
 		curWeapon = self getCurrentWeapon();
-		
+
 		switch ( weaponClass( curWeapon ) )
 		{
 			case "rifle":
@@ -451,20 +451,20 @@ watchWeaponUsage()
 watchCurrentFiring( curWeapon )
 {
 	self endon("disconnect");
-	
+
 	startAmmo = self getWeaponAmmoClip( curWeapon );
 	wasInLastStand = isDefined( self.lastStand );
-	
+
 	self waittill ( "end_firing" );
-	
+
 	if ( !self hasWeapon( curWeapon ) )
 		return;
-	
+
 	// ignore the case where a player is firing as they enter last stand.
 	// it makes it too hard to calculate shotsFired properly.
 	if ( isDefined( self.lastStand ) && !wasInLastStand )
 		return;
-	
+
 	shotsFired = startAmmo - (self getWeaponAmmoClip( curWeapon )) + 1;
 
 	if ( isDefined( self.lastStandParams ) && self.lastStandParams.lastStandStartTime == getTime() )
@@ -473,14 +473,14 @@ watchCurrentFiring( curWeapon )
 		return;
 	}
 
-	assertEx( shotsFired >= 0, shotsFired + " startAmmo: " + startAmmo + " clipAmmo: " + self getWeaponAmmoclip( curWeapon ) + " w/ " + curWeapon  );	
+	assertEx( shotsFired >= 0, shotsFired + " startAmmo: " + startAmmo + " clipAmmo: " + self getWeaponAmmoclip( curWeapon ) + " w/ " + curWeapon  );
 	if ( shotsFired <= 0 )
 		return;
-	
-	statTotal = self maps\mp\gametypes\_persistence::statGet( "total_shots" ) + shotsFired;		
+
+	statTotal = self maps\mp\gametypes\_persistence::statGet( "total_shots" ) + shotsFired;
 	statHits  = self maps\mp\gametypes\_persistence::statGet( "hits" ) + self.hits;
 	statMisses = self maps\mp\gametypes\_persistence::statGet( "misses" ) + shotsFired - self.hits;
-	
+
 	self maps\mp\gametypes\_persistence::statSet( "total_shots", statTotal );
 	self maps\mp\gametypes\_persistence::statSet( "hits", statHits );
 	self maps\mp\gametypes\_persistence::statSet( "misses", statMisses );
@@ -521,8 +521,8 @@ updateWeaponUsageStats( startAmmo, endAmmo )
 
 	assert( shotsFired >= 0 );
 
-	total = self maps\mp\gametypes\_persistence::statGet( "total_shots" ) + shotsFired;				
-	hits  = self maps\mp\gametypes\_persistence::statGet( "hits" );				
+	total = self maps\mp\gametypes\_persistence::statGet( "total_shots" ) + shotsFired;
+	hits  = self maps\mp\gametypes\_persistence::statGet( "hits" );
 	self maps\mp\gametypes\_persistence::statSet( "misses", total - hits );
 	self maps\mp\gametypes\_persistence::statSet( "total_shots", total );
 	self maps\mp\gametypes\_persistence::statSet( "accuracy", int(hits * 10000 / total) );
@@ -537,26 +537,26 @@ friendlyFireCheck( owner, attacker, forcedFriendlyFireRule )
 {
 	if ( !isdefined(owner) ) // owner has disconnected? allow it
 		return true;
-	
+
 	if ( !level.teamBased ) // not a team based mode? allow it
 		return true;
-	
+
 	friendlyFireRule = level.friendlyfire;
 	if ( isdefined( forcedFriendlyFireRule ) )
 		friendlyFireRule = forcedFriendlyFireRule;
-	
+
 	if ( friendlyFireRule != 0 ) // friendly fire is on? allow it
 		return true;
-	
+
 	if ( attacker == owner ) // owner may attack his own items
 		return true;
-	
+
 	if (!isdefined(attacker.pers["team"])) // attacker not on a team? allow it
 		return true;
-	
+
 	if ( attacker.pers["team"] != owner.pers["team"] ) // attacker not on the same team as the owner? allow it
 		return true;
-	
+
 	return false; // disallow it
 }
 
@@ -564,10 +564,10 @@ watchGrenadeUsage()
 {
 	self endon( "death" );
 	self endon( "disconnect" );
-	
+
 	self.throwingGrenade = false;
 	self.gotPullbackNotify = false;
-	
+
 	if ( getdvar("scr_deleteexplosivesonspawn") == "" )
 		setdvar("scr_deleteexplosivesonspawn", "1");
 	if ( getdvarint("scr_deleteexplosivesonspawn") == 1 )
@@ -600,27 +600,27 @@ watchGrenadeUsage()
 		if ( !isdefined( self.claymorearray ) )
 			self.claymorearray = [];
 	}
-	
+
 	thread watchC4();
 	thread watchC4Detonation();
 	thread watchC4AltDetonation();
 	thread watchClaymores();
 	thread deleteC4AndClaymoresOnDisconnect();
-	
+
 	self thread watchForThrowbacks();
-	
+
 	for ( ;; )
 	{
 		self waittill ( "grenade_pullback", weaponName );
-		
+
 		self.hasDoneCombat = true;
 
 		if ( weaponName == "claymore_mp" )
 			continue;
-		
+
 		self.throwingGrenade = true;
 		self.gotPullbackNotify = true;
-		
+
 		if ( weaponName == "c4_mp" )
 			self beginC4Tracking();
 		else
@@ -633,20 +633,20 @@ beginGrenadeTracking()
 {
 	self endon ( "death" );
 	self endon ( "disconnect" );
-	
+
 	startTime = getTime();
-	
+
 	self waittill ( "grenade_fire", grenade, weaponName );
-	
+
 	if ( (getTime() - startTime > 1000) )
 		grenade.isCooked = true;
-	
+
 	if ( weaponName == "frag_grenade_mp" )
 	{
 		grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
 		grenade.originalOwner = self;
 	}
-		
+
 	self.throwingGrenade = false;
 }
 
@@ -655,7 +655,7 @@ beginC4Tracking()
 {
 	self endon ( "death" );
 	self endon ( "disconnect" );
-	
+
 	self waittill_any ( "grenade_fire", "weapon_change" );
 	self.throwingGrenade = false;
 }
@@ -664,7 +664,7 @@ watchForThrowbacks()
 {
 	self endon ( "death" );
 	self endon ( "disconnect" );
-	
+
 	for ( ;; )
 	{
 		self waittill ( "grenade_fire", grenade, weapname );
@@ -675,10 +675,10 @@ watchForThrowbacks()
 		}
 		if ( !isSubStr( weapname, "frag_" ) )
 			continue;
-		
+
 		// no grenade_pullback notify! we must have picked it up off the ground.
 		grenade.threwBack = true;
-		
+
 		grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
 		grenade.originalOwner = self;
 	}
@@ -698,11 +698,11 @@ watchC4()
 		{
 			if ( !self.c4array.size )
 				self thread watchC4AltDetonate();
-			
+
 			self.c4array[self.c4array.size] = c4;
 			c4.owner = self;
 			c4.activated = false;
-			
+
 			c4 thread maps\mp\gametypes\_shellshock::c4_earthQuake();
 			c4 thread c4Activate();
 			c4 thread c4Damage();
@@ -731,7 +731,7 @@ watchClaymores()
 			claymore thread playClaymoreEffects();
 			claymore thread claymoreDetectionTrigger_wait( self.pers["team"] );
 			claymore maps\mp\_entityheadicons::setEntityHeadIcon(self.pers["team"], (0,0,20));
-			
+
 			/#
 			if ( getdvarint("scr_claymoredebug") )
 			{
@@ -758,15 +758,15 @@ vectorcross( v1, v2 )
 showCone( angle, range, color )
 {
 	self endon("death");
-	
+
 	start = self.origin;
 	forward = anglestoforward(self.angles);
 	right = vectorcross( forward, (0,0,1) );
 	up = vectorcross( forward, right );
-	
+
 	fullforward = forward * range * cos( angle );
 	sideamnt = range * sin( angle );
-	
+
 	while(1)
 	{
 		prevpoint = (0,0,0);
@@ -801,37 +801,37 @@ waitTillNotMoving()
 claymoreDetonation()
 {
 	self endon("death");
-	
+
 	self waitTillNotMoving();
-	
+
 	damagearea = spawn("trigger_radius", self.origin + (0,0,0-level.claymoreDetonateRadius), 0, level.claymoreDetonateRadius, level.claymoreDetonateRadius*2);
 	self thread deleteOnDeath( damagearea );
-	
+
 	while(1)
 	{
 		damagearea waittill("trigger", player);
-		
+
 		if ( getdvarint("scr_claymoredebug") != 1 )
 		{
 			if ( isdefined( self.owner ) && player == self.owner )
-				continue;
+				continue; 
 			if ( !friendlyFireCheck( self.owner, player, 0 ) )
 				continue;
 		}
 		if ( lengthsquared( player getVelocity() ) < 10 )
 			continue;
-		
+
 		if ( !player shouldAffectClaymore( self ) )
 			continue;
-		
+
 		if ( player damageConeTrace( self.origin, self ) > 0 )
 			break;
 	}
-	
+
 	self playsound ("claymore_activated");
-	
+
 	wait level.claymoreDetectionGracePeriod;
-	
+
 	self maps\mp\_entityheadicons::setEntityHeadIcon("none");
 	self detonate();
 }
@@ -839,16 +839,16 @@ claymoreDetonation()
 shouldAffectClaymore( claymore )
 {
 	pos = self.origin + (0,0,32);
-	
+
 	dirToPos = pos - claymore.origin;
 	claymoreForward = anglesToForward( claymore.angles );
-	
+
 	dist = vectorDot( dirToPos, claymoreForward );
 	if ( dist < level.claymoreDetectionMinDist )
 		return false;
-	
+
 	dirToPos = vectornormalize( dirToPos );
-	
+
 	dot = vectorDot( dirToPos, claymoreForward );
 	return ( dot > level.claymoreDetectionDot );
 }
@@ -866,9 +866,9 @@ c4Activate()
 	self endon("death");
 
 	self waittillNotMoving();
-	
+
 	wait 0.05;
-	
+
 	self notify("activated");
 	self.activated = true;
 }
@@ -876,10 +876,10 @@ c4Activate()
 watchC4AltDetonate()
 {
 	self endon("death");
-	self endon( "disconnect" );	
+	self endon( "disconnect" );
 	self endon( "detonated" );
 	level endon( "game_ended" );
-	
+
 	buttonTime = 0;
 	for( ;; )
 	{
@@ -891,25 +891,25 @@ watchC4AltDetonate()
 				buttonTime += 0.05;
 				wait( 0.05 );
 			}
-			
+
 			println( "pressTime1: " + buttonTime );
 			if ( buttonTime >= 0.5 )
 				continue;
-			
-			buttonTime = 0;				
+
+			buttonTime = 0;
 			while ( !self UseButtonPressed() && buttonTime < 0.5 )
 			{
 				buttonTime += 0.05;
 				wait( 0.05 );
 			}
-			
+
 			println( "delayTime: " + buttonTime );
 			if ( buttonTime >= 0.5 )
 				continue;
 
 			if ( !self.c4Array.size )
 				return;
-				
+
 			self notify ( "alt_detonate" );
 		}
 		wait ( 0.05 );
@@ -987,12 +987,12 @@ deleteC4AndClaymoresOnDisconnect()
 {
 	self endon("death");
 	self waittill("disconnect");
-	
+
 	c4array = self.c4array;
 	claymorearray = self.claymorearray;
-	
+
 	wait .05;
-	
+
 	for ( i = 0; i < c4array.size; i++ )
 	{
 		if ( isdefined(c4array[i]) )
@@ -1012,54 +1012,54 @@ c4Damage()
 	self setcandamage(true);
 	self.maxhealth = 100000;
 	self.health = self.maxhealth;
-	
+
 	attacker = undefined;
-	
+
 	while(1)
 	{
 		self waittill ( "damage", damage, attacker, direction_vec, point, type, modelName, tagName, partName, iDFlags );
 		if ( !isplayer(attacker) )
 			continue;
-		
+
 		// don't allow people to destroy C4 on their team if FF is off
 		if ( !friendlyFireCheck( self.owner, attacker ) )
 			continue;
-		
+
 		if ( damage < 5 ) // ignore concussion grenades
 			continue;
-		
+
 		break;
 	}
-	
+
 	if ( level.c4explodethisframe )
 		wait .1 + randomfloat(.4);
 	else
 		wait .05;
-	
+
 	if (!isdefined(self))
 		return;
-	
+
 	level.c4explodethisframe = true;
-	
+
 	thread resetC4ExplodeThisFrame();
-	
+
 	self maps\mp\_entityheadicons::setEntityHeadIcon("none");
-	
+
 	if ( isDefined( type ) && (isSubStr( type, "MOD_GRENADE" ) || isSubStr( type, "MOD_EXPLOSIVE" )) )
 		self.wasChained = true;
-	
+
 	if ( isDefined( iDFlags ) && (iDFlags & level.iDFLAGS_PENETRATION) )
 		self.wasDamagedFromBulletPenetration = true;
-	
+
 	self.wasDamaged = true;
-	
+
 	// "destroyed_explosive" notify, for challenges
 	if ( isdefined( attacker ) && isdefined( attacker.pers["team"] ) && isdefined( self.owner ) && isdefined( self.owner.pers["team"] ) )
 	{
 		if ( attacker.pers["team"] != self.owner.pers["team"] )
 			attacker notify("destroyed_explosive");
 	}
-	
+
 	self detonate( attacker );
 	// won't get here; got death notify.
 }
@@ -1083,26 +1083,26 @@ playC4Effects()
 {
 	self endon("death");
 	self waittill("activated");
-	
+
 	while(1)
 	{
 		org = self getTagOrigin( "tag_fx" );
 		ang = self getTagAngles( "tag_fx" );
-		
+
 		fx = spawnFx( level.C4FXid, org, anglesToForward( ang ), anglesToUp( ang ) );
 		triggerfx( fx );
-		
+
 		self thread clearFXOnDeath( fx );
-		
+
 		originalOrigin = self.origin;
-		
+
 		while(1)
 		{
 			wait .25;
 			if ( self.origin != originalOrigin )
 				break;
 		}
-		
+
 		fx delete();
 		self waittillNotMoving();
 	}
@@ -1115,18 +1115,18 @@ c4DetectionTrigger( ownerTeam )
 		return;
 
 	self waittill( "activated" );
-	
+
 	trigger = spawn( "trigger_radius", self.origin-(0,0,128), 0, 512, 256 );
 	trigger.detectId = "trigger" + getTime() + randomInt( 1000000 );
 
 	trigger thread detectIconWaiter( level.otherTeam[ownerTeam] );
-		
+
 	self waittill( "death" );
 	trigger notify ( "end_detection" );
 
 	if ( isDefined( trigger.bombSquadIcon ) )
 		trigger.bombSquadIcon destroy();
-	
+
 	trigger delete();
 }
 
@@ -1146,7 +1146,7 @@ claymoreDetectionTrigger( ownerTeam )
 {
 	trigger = spawn( "trigger_radius", self.origin-(0,0,128), 0, 512, 256 );
 	trigger.detectId = "trigger" + getTime() + randomInt( 1000000 );
-		
+
 	trigger thread detectIconWaiter( level.otherTeam[ownerTeam] );
 
 	self waittill( "death" );
@@ -1154,8 +1154,8 @@ claymoreDetectionTrigger( ownerTeam )
 
 	if ( isDefined( trigger.bombSquadIcon ) )
 		trigger.bombSquadIcon destroy();
-	
-	trigger delete();	
+
+	trigger delete();
 }
 
 
@@ -1167,13 +1167,13 @@ detectIconWaiter( detectTeam )
 	while( !level.gameEnded )
 	{
 		self waittill( "trigger", player );
-		
+
 		if ( !player.detectExplosives )
 			continue;
-			
+
 		if ( player.team != detectTeam )
 			continue;
-			
+
 		if ( isDefined( player.bombSquadIds[self.detectId] ) )
 			continue;
 
@@ -1196,7 +1196,7 @@ detectIconWaiter( detectTeam )
 
 		while( isAlive( player ) && player isTouching( self ) )
 			wait ( 0.05 );
-		
+
 		self.bombSquadIcon fadeOverTime( 0.25 );
 		self.bombSquadIcon.alpha = 0;
 		*/
@@ -1207,7 +1207,7 @@ detectIconWaiter( detectTeam )
 setupBombSquad()
 {
 	self.bombSquadIds = [];
-	
+
 	if ( self.detectExplosives && !self.bombSquadIcons.size )
 	{
 		for ( index = 0; index < 4; index++ )
@@ -1227,7 +1227,7 @@ setupBombSquad()
 	{
 		for ( index = 0; index < self.bombSquadIcons.size; index++ )
 			self.bombSquadIcons[index] destroy();
-			
+
 		self.bombSquadIcons = [];
 	}
 }
@@ -1243,16 +1243,16 @@ showHeadIcon( trigger )
 
 		if ( detectId == triggerDetectId )
 			return;
-			
+
 		if ( detectId == "" )
 			useId = index;
 	}
-	
+
 	if ( useId < 0 )
 		return;
 
 	self.bombSquadIds[triggerDetectId] = true;
-	
+
 	self.bombSquadIcons[useId].x = trigger.origin[0];
 	self.bombSquadIcons[useId].y = trigger.origin[1];
 	self.bombSquadIcons[useId].z = trigger.origin[2]+24+128;
@@ -1260,13 +1260,13 @@ showHeadIcon( trigger )
 	self.bombSquadIcons[useId] fadeOverTime( 0.25 );
 	self.bombSquadIcons[useId].alpha = 1;
 	self.bombSquadIcons[useId].detectId = trigger.detectId;
-	
+
 	while ( isAlive( self ) && isDefined( trigger ) && self isTouching( trigger ) )
 		wait ( 0.05 );
-		
+
 	if ( !isDefined( self ) )
 		return;
-		
+
 	self.bombSquadIcons[useId].detectId = "";
 	self.bombSquadIcons[useId] fadeOverTime( 0.25 );
 	self.bombSquadIcons[useId].alpha = 0;
@@ -1277,27 +1277,27 @@ showHeadIcon( trigger )
 playClaymoreEffects()
 {
 	self endon("death");
-	
+
 	while(1)
 	{
 		self waittillNotMoving();
-		
+
 		org = self getTagOrigin( "tag_fx" );
 		ang = self getTagAngles( "tag_fx" );
 		fx = spawnFx( level.claymoreFXid, org, anglesToForward( ang ), anglesToUp( ang ) );
 		triggerfx( fx );
-		
+
 		self thread clearFXOnDeath( fx );
-		
+
 		originalOrigin = self.origin;
-		
+
 		while(1)
 		{
 			wait .25;
 			if ( self.origin != originalOrigin )
 				break;
 		}
-		
+
 		fx delete();
 	}
 }
@@ -1318,20 +1318,20 @@ clearFXOnDeath( fx )
 getDamageableEnts(pos, radius, doLOS, startRadius)
 {
 	ents = [];
-	
+
 	if (!isdefined(doLOS))
 		doLOS = false;
-		
+
 	if ( !isdefined( startRadius ) )
 		startRadius = 0;
-	
+
 	// players
 	players = level.players;
 	for (i = 0; i < players.size; i++)
 	{
 		if (!isalive(players[i]) || players[i].sessionstate != "playing")
 			continue;
-		
+
 		playerpos = players[i].origin + (0,0,32);
 		dist = distance(pos, playerpos);
 		if (dist < radius && (!doLOS || weaponDamageTracePassed(pos, playerpos, startRadius, undefined)))
@@ -1344,7 +1344,7 @@ getDamageableEnts(pos, radius, doLOS, startRadius)
 			ents[ents.size] = newent;
 		}
 	}
-	
+
 	// grenades
 	grenades = getentarray("grenade", "classname");
 	for (i = 0; i < grenades.size; i++)
@@ -1393,14 +1393,14 @@ getDamageableEnts(pos, radius, doLOS, startRadius)
 			ents[ents.size] = newent;
 		}
 	}
-	
+
 	return ents;
 }
 
 weaponDamageTracePassed(from, to, startRadius, ignore)
 {
 	midpos = undefined;
-	
+
 	diff = to - from;
 	if ( lengthsquared( diff ) < startRadius*startRadius )
 		midpos = to;
@@ -1408,7 +1408,7 @@ weaponDamageTracePassed(from, to, startRadius, ignore)
 	midpos = from + (dir[0]*startRadius, dir[1]*startRadius, dir[2]*startRadius);
 
 	trace = bullettrace(midpos, to, false, ignore);
-	
+
 	if ( getdvarint("scr_damage_debug") != 0 )
 	{
 		if (trace["fraction"] == 1)
@@ -1421,7 +1421,7 @@ weaponDamageTracePassed(from, to, startRadius, ignore)
 			thread debugline(trace["position"], to, (1,.4,.3));
 		}
 	}
-	
+
 	return (trace["fraction"] == 1);
 }
 
@@ -1455,7 +1455,7 @@ damageEnt(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, damagepos, dam
 		// destructable walls and such can only be damaged in certain ways.
 		if (self.isADestructable && (sWeapon == "artillery_mp" || sWeapon == "claymore_mp"))
 			return;
-		
+
 		self.entity notify("damage", iDamage, eAttacker, (0,0,0), (0,0,0), "mod_explosive", "", "" );
 	}
 }
@@ -1481,12 +1481,12 @@ onWeaponDamage( eInflictor, sWeapon, meansOfDeath, damage )
 			// should match weapon settings in gdt
 			radius = 512;
 			scale = 1 - (distance( self.origin, eInflictor.origin ) / radius);
-			
+
 			if ( scale < 0 )
 				scale = 0;
-			
+
 			time = 2 + (4 * scale);
-			
+
 			wait ( 0.05 );
 			self shellShock( "concussion_grenade_mp", time );
 			self.concussionEndTime = getTime() + (time * 1000);
@@ -1496,7 +1496,7 @@ onWeaponDamage( eInflictor, sWeapon, meansOfDeath, damage )
 			maps\mp\gametypes\_shellshock::shellshockOnDamage( meansOfDeath, damage );
 		break;
 	}
-	
+
 }
 
 // weapon stowing logic ===================================================================
@@ -1536,25 +1536,25 @@ updateStowedWeapon()
 	self endon( "spawned" );
 	self endon( "killed_player" );
 	self endon( "disconnect" );
-	
+
 	//detach_all_weapons();
-	
+
 	self.tag_stowed_back = undefined;
 	self.tag_stowed_hip = undefined;
-	
+
 	team = self.pers["team"];
 	class = self.pers["class"];
-	
+
 	while ( true )
 	{
 		self waittill( "weapon_change", newWeapon );
-		
+
 		// weapon array reset, might have swapped weapons off the ground
 		self.weapon_array_primary =[];
 		self.weapon_array_sidearm = [];
 		self.weapon_array_grenade = [];
 		self.weapon_array_inventory =[];
-	
+
 		// populate player's weapon stock arrays
 		weaponsList = self GetWeaponsList();
 		for( idx = 0; idx < weaponsList.size; idx++ )
@@ -1595,7 +1595,7 @@ stow_on_back()
 	current = self getCurrentWeapon();
 
 	self.tag_stowed_back = undefined;
-	
+
 	//  large projectile weaponry always show
 	if ( self hasWeapon( "rpg_mp" ) && current != "rpg_mp" )
 	{
@@ -1607,21 +1607,21 @@ stow_on_back()
 		{
 			index_weapon = self.weapon_array_primary[idx];
 			assertex( isdefined( index_weapon ), "Primary weapon list corrupted." );
-			
+
 			if ( index_weapon == current )
 				continue;
-				
+
 			/*
 			if ( (isSubStr( current, "gl_" ) || isSubStr( current, "_gl_" )) && (isSubStr( self.weapon_array_primary[idx], "gl_" ) || isSubStr( self.weapon_array_primary[idx], "_gl_" )) )
-				continue; 
+				continue;
 			*/
-			
+
 			if( isSubStr( current, "gl_" ) || isSubStr( index_weapon, "gl_" ) )
 			{
 				index_weapon_tok = strtok( index_weapon, "_" );
 				current_tok = strtok( current, "_" );
 				// finding the alt-mode of current weapon; the tokens of both weapons are subsets of each other
-				for( i=0; i<index_weapon_tok.size; i++ ) 
+				for( i=0; i<index_weapon_tok.size; i++ )
 				{
 					if( !isSubStr( current, index_weapon_tok[i] ) || index_weapon_tok.size != current_tok.size )
 					{
@@ -1641,7 +1641,7 @@ stow_on_back()
 				self.tag_stowed_back = getWeaponModel( index_weapon, 0 );
 		}
 	}
-	
+
 	if ( !isDefined( self.tag_stowed_back ) )
 		return;
 
@@ -1658,11 +1658,11 @@ stow_on_hip()
 	{
 		if ( self.weapon_array_sidearm[idx] == current )
 			continue;
-			
+
 		self.tag_stowed_hip = self.weapon_array_sidearm[idx];
 	}
 	*/
-	
+
 	for ( idx = 0; idx < self.weapon_array_inventory.size; idx++ )
 	{
 		if ( self.weapon_array_inventory[idx] == current )
@@ -1670,10 +1670,10 @@ stow_on_hip()
 
 		if ( !self GetWeaponAmmoStock( self.weapon_array_inventory[idx] ) )
 			continue;
-			
+
 		self.tag_stowed_hip = self.weapon_array_inventory[idx];
 	}
-	
+
 	if ( !isDefined( self.tag_stowed_hip ) )
 		return;
 

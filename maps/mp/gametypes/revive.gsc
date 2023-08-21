@@ -42,18 +42,14 @@ checkRevive(attacker, sMeansOfDeath)
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
 	{
-		resBox = createUseObject( team, trigger, visuals, (0,0,32) );
-		resBox allowUse( "friendly" );
-		resBox setUseTime( 0 );
-		resBox set2DIcon( "friendly", "revive_icon" );
-		resBox set3DIcon( "friendly", "revive_icon" );
-		resBox setVisibleTeam( "friendly" );
+		resObjective = maps\mp\gametypes\_objpoints::createTeamObjpoint( "revive_"+ self.name, self.body.origin + (0,0,32), team, "revive_icon" );
+		resObjective setWayPoint(true, "revive_icon");
 
-		self thread monitorBody(trigger, resBox);
+		self thread monitorBody(trigger, resObjective);
 	}
 }
 
-monitorBody(trigger, resBox) {
+monitorBody(trigger, resObjective) {
 	self endon("disconnect");
 	self endon("revived");
 	level endon( "game_ended" );
@@ -64,16 +60,16 @@ monitorBody(trigger, resBox) {
 		trigger waittill("trigger", player);
 		if ( player.pers["team"] == self.pers["team"] && !player.checkingBody ) {
 			player.checkingBody = true;
-			
+
 			if (isdefined(self.droppedDeathItem)) {
 				self.droppedDeathItem triggerOff();
 			}
-			player thread checkIfReviving( self, trigger, resBox );		
+			player thread checkIfReviving( self, trigger, resObjective );
 		}
-	}	
+	}
 }
 
-checkIfReviving( deadPlayer, trigger, resBox )
+checkIfReviving( deadPlayer, trigger, resObjective )
 {
 	self endon("disconnect");
 	self endon("death");
@@ -92,7 +88,7 @@ checkIfReviving( deadPlayer, trigger, resBox )
 	text = createFontString( "objective", 1.5 );
 	text setPoint("CENTER", undefined, level.primaryProgressBarTextX, level.primaryProgressBarTextY);
 	text setText("hold 'USE' to revive ^2"+ deadPlayer.name);
-	
+
 	// Stay here as long as the body exists and the player is touching it
 	while ( isDefined( self ) && isDefined( deadPlayer.body ) && self isTouching( trigger ) ) {
 		wait (0.05);
@@ -112,33 +108,31 @@ checkIfReviving( deadPlayer, trigger, resBox )
 
 		if (barData.curProgress >= barData.useTime) {
 			wait (0.05);
-			revivePlayer(deadPlayer, resBox);
+			revivePlayer(deadPlayer, resObjective);
 			break;
 		}
 	}
 	text destroy();
 
-	// Body is not there or the player is not touching the trigger anymore	
+	// Body is not there or the player is not touching the trigger anymore
 	self.checkingBody = false;
 	if (isdefined(deadPlayer.droppedDeathItem)) {
 		deadPlayer.droppedDeathItem triggerOn();
 	}
 }
 
-revivePlayer( deadPlayer, resBox )
+revivePlayer( deadPlayer, resObjective )
 {
 	deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
 	deadPlayer.reviveCount++;
 	deadPlayer.health = 10;
 	deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
 	deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
-	resBox disableObject();
 
 	level notify("player_revived");
 	deadPlayer notify("revived");
-	
-	resBox.visuals[0] delete();
-	resBox.trigger delete();
+
+	maps\mp\gametypes\_objpoints::deleteObjPoint(resObjective);
 	deadPlayer.body delete();
 	wait 0.05;
 	deadPlayer.health = getMaxHealth();
@@ -146,7 +140,7 @@ revivePlayer( deadPlayer, resBox )
 }
 
 
-printAliveCount() 
+printAliveCount()
 {
 	printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
 	printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
@@ -160,7 +154,7 @@ printMsg(pl, msg)
 printAllPlayers(msg)
 {
 	players = getEntArray("player", "classname");
-	
+
 	for(i = 0; i < players.size; i++)
 	{
 		// Send a message to all players
@@ -171,10 +165,10 @@ printAllPlayers(msg)
 printTeam(msg, team)
 {
 	players = getEntArray("player", "classname");
-	
+
 	for(i = 0; i < players.size; i++)
 	{
-		if (players[i].pers["team"] == team) 
+		if (players[i].pers["team"] == team)
 		{
 			// Send a message to all team players
 			thread printMsg(players[i], msg);

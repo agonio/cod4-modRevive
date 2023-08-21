@@ -10,7 +10,7 @@
 	------------------
 		Spawnpoints:
 			classname		mp_tdm_spawn
-			All players spawn from these. The spawnpoint chosen is dependent on the current locations of owned flags, teammates and 
+			All players spawn from these. The spawnpoint chosen is dependent on the current locations of owned flags, teammates and
 			enemies at the time of spawn. Players generally spawn behind their teammates relative to the direction of enemies.
 			Optionally, give a spawnpoint a script_linkto to specify which flag it "belongs" to (see Flag Descriptors).
 
@@ -23,16 +23,16 @@
 			classname       trigger_radius
 			targetname      flag_primary or flag_secondary
 			Flags that need to be captured to win. Primary flags take time to capture; secondary flags are instant.
-		
+
 		Flag Descriptors:
 			classname       script_origin
 			targetname      flag_descriptor
 			Place one flag descriptor close to each flag. Use the script_linkname and script_linkto properties to say which flags
-			it can be considered "adjacent" to in the level. For instance, if players have a primary path from flag1 to flag2, and 
+			it can be considered "adjacent" to in the level. For instance, if players have a primary path from flag1 to flag2, and
 			from flag2 to flag3, flag2 would have a flag_descriptor with these properties:
 			script_linkname flag2
 			script_linkto flag1 flag3
-			
+
 			Set scr_domdebug to 1 to see flag connections and what spawnpoints are considered connected to each flag.
 
 	Level script requirements
@@ -81,7 +81,7 @@ main()
 	maps\mp\gametypes\_globallogic::registerScoreLimitDvar( "dom", 300, 0, 1000 );
 	maps\mp\gametypes\_globallogic::registerRoundLimitDvar( "dom", 1, 0, 10 );
 	maps\mp\gametypes\_globallogic::registerNumLivesDvar( "dom", 0, 0, 10 );
-	
+
 	level.teamBased = true;
 	level.overrideTeamScore = true;
 	level.onStartGameType = ::onStartGameType;
@@ -136,20 +136,19 @@ onPrecacheGameType()
 	precacheShader( "waypoint_captureneutral_e" );
 	precacheShader( "waypoint_capture_e" );
 	precacheShader( "waypoint_defend_e" );
-	
+
 	flagBaseFX = [];
 	flagBaseFX["marines"] = "misc/ui_flagbase_silver";
 	flagBaseFX["sas"    ] = "misc/ui_flagbase_black";
 	flagBaseFX["russian"] = "misc/ui_flagbase_red";
 	flagBaseFX["opfor"  ] = "misc/ui_flagbase_gold";
-	
+
 	level.flagBaseFXid[ "allies" ] = loadfx( flagBaseFX[ game[ "allies" ] ] );
 	level.flagBaseFXid[ "axis"   ] = loadfx( flagBaseFX[ game[ "axis"   ] ] );
 }
 
-
 onStartGameType()
-{	
+{
 	maps\mp\gametypes\_globallogic::setObjectiveText( "allies", &"OBJECTIVES_DOM" );
 	maps\mp\gametypes\_globallogic::setObjectiveText( "axis", &"OBJECTIVES_DOM" );
 
@@ -174,17 +173,17 @@ onStartGameType()
 	maps\mp\gametypes\_spawnlogic::placeSpawnPoints( "mp_dom_spawn_axis_start" );
 	maps\mp\gametypes\_spawnlogic::addSpawnPoints( "allies", "mp_dom_spawn" );
 	maps\mp\gametypes\_spawnlogic::addSpawnPoints( "axis", "mp_dom_spawn" );
-	
+
 	level.mapCenter = maps\mp\gametypes\_spawnlogic::findBoxCenter( level.spawnMins, level.spawnMaxs );
 	setMapCenter( level.mapCenter );
-	
+
 	level.spawn_all = getentarray( "mp_dom_spawn", "classname" );
 	level.spawn_axis_start = getentarray("mp_dom_spawn_axis_start", "classname" );
 	level.spawn_allies_start = getentarray("mp_dom_spawn_allies_start", "classname" );
-	
+
 	level.startPos["allies"] = level.spawn_allies_start[0].origin;
 	level.startPos["axis"] = level.spawn_axis_start[0].origin;
-	
+
 	allowed[0] = "dom";
 //	allowed[1] = "hardpoint";
 	maps\mp\gametypes\_gameobjects::main(allowed);
@@ -200,16 +199,16 @@ onStartGameType()
 
 	maps\mp\gametypes\_rank::registerScoreInfo( "assault", 5 );
 	maps\mp\gametypes\_rank::registerScoreInfo( "assault_assist", 1 );
-		
+
 	thread domFlags();
-	thread updateDomScores();	
+	thread updateDomScores();
 }
 
 
 onSpawnPlayer()
 {
 	spawnpoint = undefined;
-	
+
 	if ( !level.useStartSpawns )
 	{
 		flagsOwned = 0;
@@ -224,12 +223,12 @@ onSpawnPlayer()
 			else if ( team == enemyTeam )
 				enemyFlagsOwned++;
 		}
-		
+
 		if ( flagsOwned == level.flags.size )
 		{
 			// own all flags! pretend we don't own the last one we got, so enemies can spawn there
 			enemyBestSpawnFlag = level.bestSpawnFlag[ getOtherTeam( self.pers["team"] ) ];
-			
+
 			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam( level.spawn_all, getSpawnsBoundingFlag( enemyBestSpawnFlag ) );
 		}
 		else if ( flagsOwned > 0 )
@@ -252,11 +251,11 @@ onSpawnPlayer()
 				bestFlag = level.bestSpawnFlag[ self.pers["team"] ];
 			}
 			level.bestSpawnFlag[ self.pers["team"] ] = bestFlag;
-			
+
 			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam( level.spawn_all, bestFlag.nearbyspawns );
 		}
 	}
-	
+
 	if ( !isdefined( spawnpoint ) )
 	{
 		if (self.pers["team"] == "axis")
@@ -264,11 +263,11 @@ onSpawnPlayer()
 		else
 			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(level.spawn_allies_start);
 	}
-	
+
 	//spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam( level.spawn_all );
-	
+
 	assert( isDefined(spawnpoint) );
-	
+
 	self spawn(spawnpoint.origin, spawnpoint.angles);
 }
 
@@ -277,7 +276,7 @@ domFlags()
 {
 	level.lastStatus["allies"] = 0;
 	level.lastStatus["axis"] = 0;
-	
+
 	game["flagmodels"] = [];
 	game["flagmodels"]["neutral"] = "prop_flag_neutral";
 
@@ -285,18 +284,18 @@ domFlags()
 		game["flagmodels"]["allies"] = "prop_flag_american";
 	else
 		game["flagmodels"]["allies"] = "prop_flag_brit";
-	
-	if ( game["axis"] == "russian" ) 
+
+	if ( game["axis"] == "russian" )
 		game["flagmodels"]["axis"] = "prop_flag_russian";
 	else
 		game["flagmodels"]["axis"] = "prop_flag_opfor";
-	
+
 	precacheModel( game["flagmodels"]["neutral"] );
 	precacheModel( game["flagmodels"]["allies"] );
 	precacheModel( game["flagmodels"]["axis"] );
-	
 
-	
+
+
 	precacheString( &"MP_CAPTURING_FLAG" );
 	precacheString( &"MP_LOSING_FLAG" );
 	//precacheString( &"MP_LOSING_LAST_FLAG" );
@@ -307,25 +306,25 @@ domFlags()
 	precacheString( &"MP_ENEMY_FLAG_CAPTURED_BY" );
 	precacheString( &"MP_NEUTRAL_FLAG_CAPTURED_BY" );
 	precacheString( &"MP_FRIENDLY_FLAG_CAPTURED_BY" );
-	
-	
+
+
 	primaryFlags = getEntArray( "flag_primary", "targetname" );
 	secondaryFlags = getEntArray( "flag_secondary", "targetname" );
-	
+
 	if ( (primaryFlags.size + secondaryFlags.size) < 2 )
 	{
 		printLn( "^1Not enough domination flags found in level!" );
 		maps\mp\gametypes\_callbacksetup::AbortLevel();
 		return;
 	}
-	
+
 	level.flags = [];
 	for ( index = 0; index < primaryFlags.size; index++ )
 		level.flags[level.flags.size] = primaryFlags[index];
-	
+
 	for ( index = 0; index < secondaryFlags.size; index++ )
 		level.flags[level.flags.size] = secondaryFlags[index];
-	
+
 	level.domFlags = [];
 	for ( index = 0; index < level.flags.size; index++ )
 	{
@@ -357,18 +356,18 @@ domFlags()
 		domFlag.onBeginUse = ::onBeginUse;
 		domFlag.onUseUpdate = ::onUseUpdate;
 		domFlag.onEndUse = ::onEndUse;
-		
-		
+
+
 		traceStart = visuals[0].origin + (0,0,32);
 		traceEnd = visuals[0].origin + (0,0,-32);
 		trace = bulletTrace( traceStart, traceEnd, false, undefined );
-	
+
 		upangles = vectorToAngles( trace["normal"] );
 		domFlag.baseeffectforward = anglesToForward( upangles );
 		domFlag.baseeffectright = anglesToRight( upangles );
-		
+
 		domFlag.baseeffectpos = trace["position"];
-		
+
 //		makeDvarServerInfo( "scr_obj" + label, "neutral" );
 //		makeDvarServerInfo( "scr_obj" + label + "_flash", 0 );
 //		setDvar( "scr_obj" + label, "neutral" );
@@ -378,19 +377,19 @@ domFlags()
 		level.flags[index].useObj = domFlag;
 		level.flags[index].adjflags = [];
 		level.flags[index].nearbyspawns = [];
-		
+
 		domFlag.levelFlag = level.flags[index];
-		
+
 		level.domFlags[level.domFlags.size] = domFlag;
 	}
-	
+
 	// level.bestSpawnFlag is used as a last resort when the enemy holds all flags.
 	level.bestSpawnFlag = [];
 	level.bestSpawnFlag[ "allies" ] = getUnownedFlagNearestStart( "allies", undefined );
 	level.bestSpawnFlag[ "axis" ] = getUnownedFlagNearestStart( "axis", level.bestSpawnFlag[ "allies" ] );
-	
+
 	flagSetup();
-	
+
 //	setDvar( level.scoreLimitDvar, level.domFlags.size );
 
 	/#
@@ -405,10 +404,10 @@ getUnownedFlagNearestStart( team, excludeFlag )
 	for ( i = 0; i < level.flags.size; i++ )
 	{
 		flag = level.flags[i];
-		
+
 		if ( flag getFlagTeam() != "neutral" )
 			continue;
-		
+
 		distsq = distanceSquared( flag.origin, level.startPos[team] );
 		if ( (!isDefined( excludeFlag ) || flag != excludeFlag) && (!isdefined( best ) || distsq < bestdistsq) )
 		{
@@ -428,7 +427,7 @@ domDebug()
 			wait 2;
 			continue;
 		}
-		
+
 		while(1)
 		{
 			if (getdvar("scr_domdebug") != "1")
@@ -438,11 +437,11 @@ domDebug()
 				for (j = 0; j < level.flags[i].adjflags.size; j++) {
 					line(level.flags[i].origin, level.flags[i].adjflags[j].origin, (1,1,1));
 				}
-				
+
 				for (j = 0; j < level.flags[i].nearbyspawns.size; j++) {
 					line(level.flags[i].origin, level.flags[i].nearbyspawns[j].origin, (.2,.2,.6));
 				}
-				
+
 				if ( level.flags[i] == level.bestSpawnFlag["allies"] )
 					print3d( level.flags[i].origin, "allies best spawn flag" );
 				if ( level.flags[i] == level.bestSpawnFlag["axis"] )
@@ -457,7 +456,7 @@ domDebug()
 onBeginUse( player )
 {
 	ownerTeam = self maps\mp\gametypes\_gameobjects::getOwnerTeam();
-	setDvar( "scr_obj" + self maps\mp\gametypes\_gameobjects::getLabel() + "_flash", 1 );	
+	setDvar( "scr_obj" + self maps\mp\gametypes\_gameobjects::getLabel() + "_flash", 1 );
 	self.didStatusNotify = false;
 
 	if ( ownerTeam == "neutral" )
@@ -466,7 +465,7 @@ onBeginUse( player )
 		self.objPoints[player.pers["team"]] thread maps\mp\gametypes\_objpoints::startFlashing();
 		return;
 	}
-		
+
 	if ( ownerTeam == "allies" )
 		otherTeam = "axis";
 	else
@@ -502,9 +501,9 @@ statusDialog( dialog, team )
 	time = getTime();
 	if ( getTime() < level.lastStatus[team] + 6000 )
 		return;
-		
+
 	thread delayedLeaderDialog( dialog, team );
-	level.lastStatus[team] = getTime();	
+	level.lastStatus[team] = getTime();
 }
 
 
@@ -521,12 +520,12 @@ resetFlagBaseEffect()
 {
 	if ( isdefined( self.baseeffect ) )
 		self.baseeffect delete();
-	
+
 	team = self maps\mp\gametypes\_gameobjects::getOwnerTeam();
-	
+
 	if ( team != "axis" && team != "allies" )
 		return;
-	
+
 	fxid = level.flagBaseFXid[ team ];
 
 	self.baseeffect = spawnFx( fxid, self.baseeffectpos, self.baseeffectforward, self.baseeffectright );
@@ -538,33 +537,33 @@ onUse( player )
 	team = player.pers["team"];
 	oldTeam = self maps\mp\gametypes\_gameobjects::getOwnerTeam();
 	label = self maps\mp\gametypes\_gameobjects::getLabel();
-	
+
 	player logString( "flag captured: " + self.label );
-	
+
 	self maps\mp\gametypes\_gameobjects::setOwnerTeam( team );
 	self maps\mp\gametypes\_gameobjects::set2DIcon( "enemy", "compass_waypoint_capture" + label );
 	self maps\mp\gametypes\_gameobjects::set3DIcon( "enemy", "waypoint_capture" + label );
 	self.visuals[0] setModel( game["flagmodels"][team] );
-	setDvar( "scr_obj" + self maps\mp\gametypes\_gameobjects::getLabel(), team );	
-	
+	setDvar( "scr_obj" + self maps\mp\gametypes\_gameobjects::getLabel(), team );
+
 	self resetFlagBaseEffect();
-	
+
 	level.useStartSpawns = false;
-	
+
 	assert( team != "neutral" );
-	
+
 	if ( oldTeam == "neutral" )
 	{
 		otherTeam = getOtherTeam( team );
 		thread printAndSoundOnEveryone( team, otherTeam, &"MP_NEUTRAL_FLAG_CAPTURED_BY", &"MP_NEUTRAL_FLAG_CAPTURED_BY", "mp_war_objective_taken", undefined, player );
-		
+
 		statusDialog( "secured"+self.label, team );
 		statusDialog( "enemy_has"+self.label, otherTeam );
 	}
 	else
 	{
 		thread printAndSoundOnEveryone( team, oldTeam, &"MP_ENEMY_FLAG_CAPTURED_BY", &"MP_FRIENDLY_FLAG_CAPTURED_BY", "mp_war_objective_taken", "mp_war_objective_lost", player );
-		
+
 //		thread delayedLeaderDialogBothTeams( "obj_lost", oldTeam, "obj_taken", team );
 
 		if ( getTeamFlagCount( team ) == level.flags.size )
@@ -573,11 +572,11 @@ onUse( player )
 			statusDialog( "lost_all", oldTeam );
 		}
 		else
-		{	
+		{
 			statusDialog( "secured"+self.label, team );
 			statusDialog( "lost"+self.label, oldTeam );
 		}
-		
+
 		level.bestSpawnFlag[ oldTeam ] = self.levelFlag;
 	}
 
@@ -588,7 +587,7 @@ giveFlagCaptureXP( touchList )
 {
 	wait .05;
 	maps\mp\gametypes\_globallogic::WaitTillSlowProcessAllowed();
-	
+
 	players = getArrayKeys( touchList );
 	for ( index = 0; index < players.size; index++ )
 	{
@@ -601,14 +600,14 @@ delayedLeaderDialog( sound, team )
 {
 	wait .1;
 	maps\mp\gametypes\_globallogic::WaitTillSlowProcessAllowed();
-	
+
 	maps\mp\gametypes\_globallogic::leaderDialog( sound, team );
 }
 delayedLeaderDialogBothTeams( sound1, team1, sound2, team2 )
 {
 	wait .1;
 	maps\mp\gametypes\_globallogic::WaitTillSlowProcessAllowed();
-	
+
 	maps\mp\gametypes\_globallogic::leaderDialogBothTeams( sound1, team1, sound2, team2 );
 }
 
@@ -640,13 +639,13 @@ updateDomScores()
 onPlayerKilled( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration )
 {
 	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
-	
+
 	if ( self.touchTriggers.size && isPlayer( attacker ) && attacker.pers["team"] != self.pers["team"] )
 	{
 		triggerIds = getArrayKeys( self.touchTriggers );
 		ownerTeam = self.touchTriggers[triggerIds[0]].useObj.ownerTeam;
 		team = self.pers["team"];
-		
+
 		if ( team == ownerTeam )
 		{
 			attacker thread [[level.onXPEvent]]( "assault" );
@@ -663,7 +662,7 @@ onPlayerKilled( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 default_onTimeLimit()
 {
 	winner = undefined;
-	
+
 	if ( level.teamBased )
 	{
 		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
@@ -684,11 +683,11 @@ default_onTimeLimit()
 		else
 			logString( "time limit, tie" );
 	}
-	
+
 	// i think these two lines are obsolete
 	makeDvarServerInfo( "ui_text_endreason", game["strings"]["time_limit_reached"] );
 	setDvar( "ui_text_endreason", game["strings"]["time_limit_reached"] );
-	
+
 	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["time_limit_reached"] );
 }
 
@@ -698,7 +697,7 @@ default_onScoreLimit()
 		return;
 
 	winner = undefined;
-	
+
 	if ( level.teamBased )
 	{
 		if ( game["teamScores"]["allies"] == game["teamScores"]["axis"] )
@@ -717,10 +716,10 @@ default_onScoreLimit()
 		else
 			logString( "scorelimit, tie" );
 	}
-	
+
 	makeDvarServerInfo( "ui_text_endreason", game["strings"]["score_limit_reached"] );
 	setDvar( "ui_text_endreason", game["strings"]["score_limit_reached"] );
-	
+
 	level.forcedEnd = true; // no more rounds if scorelimit is hit
 	thread maps\mp\gametypes\_finalkillcam::endGame( winner, game["strings"]["score_limit_reached"] );
 }
@@ -730,11 +729,11 @@ default_onScoreLimit()
 getTeamFlagCount( team )
 {
 	score = 0;
-	for (i = 0; i < level.flags.size; i++) 
+	for (i = 0; i < level.flags.size; i++)
 	{
 		if ( level.domFlags[i] maps\mp\gametypes\_gameobjects::getOwnerTeam() == team )
 			score++;
-	}	
+	}
 	return score;
 }
 
@@ -747,7 +746,7 @@ getBoundaryFlags()
 {
 	// get all flags which are adjacent to flags that aren't owned by the same team
 	bflags = [];
-	for (i = 0; i < level.flags.size; i++)
+	for (i = 0; i < level.flags.size; i++) 
 	{
 		for (j = 0; j < level.flags[i].adjflags.size; j++)
 		{
@@ -758,24 +757,24 @@ getBoundaryFlags()
 			}
 		}
 	}
-	
+
 	return bflags;
 }
 
 getBoundaryFlagSpawns(team)
 {
 	spawns = [];
-	
+
 	bflags = getBoundaryFlags();
 	for (i = 0; i < bflags.size; i++)
 	{
 		if (isdefined(team) && bflags[i] getFlagTeam() != team)
 			continue;
-		
+
 		for (j = 0; j < bflags[i].nearbyspawns.size; j++)
 			spawns[spawns.size] = bflags[i].nearbyspawns[j];
 	}
-	
+
 	return spawns;
 }
 
@@ -788,7 +787,7 @@ getSpawnsBoundingFlag( avoidflag )
 		flag = level.flags[i];
 		if ( flag == avoidflag )
 			continue;
-		
+
 		isbounding = false;
 		for (j = 0; j < flag.adjflags.size; j++)
 		{
@@ -798,14 +797,14 @@ getSpawnsBoundingFlag( avoidflag )
 				break;
 			}
 		}
-		
+
 		if ( !isbounding )
 			continue;
-		
+
 		for (j = 0; j < flag.nearbyspawns.size; j++)
 			spawns[spawns.size] = flag.nearbyspawns[j];
 	}
-	
+
 	return spawns;
 }
 
@@ -837,7 +836,7 @@ getOwnedAndBoundingFlagSpawns(team)
 			}
 		}
 	}
-	
+
 	return spawns;
 }
 
@@ -856,7 +855,7 @@ getOwnedFlagSpawns(team)
 				spawns[spawns.size] = level.flags[i].nearbyspawns[s];
 		}
 	}
-	
+
 	return spawns;
 }
 
@@ -867,9 +866,9 @@ flagSetup()
 
 	// (find each flag_descriptor object)
 	descriptors = getentarray("flag_descriptor", "targetname");
-	
+
 	flags = level.flags;
-	
+
 	for (i = 0; i < level.domFlags.size; i++)
 	{
 		closestdist = undefined;
@@ -882,7 +881,7 @@ flagSetup()
 				closestdesc = descriptors[j];
 			}
 		}
-		
+
 		if (!isdefined(closestdesc)) {
 			maperrors[maperrors.size] = "there is no flag_descriptor in the map! see explanation in dom.gsc";
 			break;
@@ -895,7 +894,7 @@ flagSetup()
 		closestdesc.flag = flags[i];
 		descriptorsByLinkname[closestdesc.script_linkname] = closestdesc;
 	}
-	
+
 	if (maperrors.size == 0)
 	{
 		// find adjacent flags
@@ -921,7 +920,7 @@ flagSetup()
 			}
 		}
 	}
-	
+
 	// assign each spawnpoint to nearest flag
 	spawnpoints = getentarray("mp_dom_spawn", "classname");
 	for (i = 0; i < spawnpoints.size; i++)
@@ -949,17 +948,17 @@ flagSetup()
 		}
 		nearestflag.nearbyspawns[nearestflag.nearbyspawns.size] = spawnpoints[i];
 	}
-	
+
 	if (maperrors.size > 0)
 	{
 		println("^1------------ Map Errors ------------");
 		for(i = 0; i < maperrors.size; i++)
 			println(maperrors[i]);
 		println("^1------------------------------------");
-		
+
 		maps\mp\_utility::error("Map errors. See above");
 		maps\mp\gametypes\_callbacksetup::AbortLevel();
-		
+
 		return;
 	}
 }

@@ -31,19 +31,19 @@ init(id, playerBeginCallback, playerEndCallback)
 {
 	//thread maps\mp\gametypes\_addons::init();
 	precacheShader("objpoint_default");
-	
+
 	handler = spawnstruct();
 	handler.id = id;
 	handler.playerBeginCallback = playerBeginCallback;
 	handler.playerEndCallback = playerEndCallback;
 	handler.enabled = false;
 	handler.players = [];
-	
+
 	thread onPlayerConnect(handler);
-	
+
 	level.handlerGlobalFlagVal = 0;
-	
-	
+
+
 	return handler;
 }
 
@@ -52,7 +52,7 @@ enable(handler)
 	if (handler.enabled)
 		return;
 	handler.enabled = true;
-	
+
 	level.handlerGlobalFlagVal++;
 	// mark all players with the global flag value; if a player isn't marked later on, we know they're not in the game.
 	// this could happen if they disconnected, causing this function to be called from elsewhere in script, but we haven't
@@ -60,14 +60,14 @@ enable(handler)
 	players = getentarray( "player", "classname" );
 	for (i = 0; i < players.size; i++)
 		players[i].handlerFlagVal = level.handlerGlobalFlagVal;
-	
+
 	// handle all players who are ready to be handled
 	players = handler.players;
-	
+
 	for (i = 0; i < players.size; i++) {
 		if (players[i].handlerFlagVal != level.handlerGlobalFlagVal)
 			continue;
-		
+
 		if (players[i].handlers[handler.id].ready)
 			players[i] handlePlayer(handler);
 	}
@@ -77,7 +77,7 @@ disable(handler)
 	if (!handler.enabled)
 		return;
 	handler.enabled = false;
-	
+
 	level.handlerGlobalFlagVal++;
 	// mark all players with the global flag value; if a player isn't marked later on, we know they're not in the game.
 	// this could happen if they disconnected, causing this function to be called from elsewhere in script, but we haven't
@@ -92,7 +92,7 @@ disable(handler)
 	for (i = 0; i < players.size; i++) {
 		if (players[i].handlerFlagVal != level.handlerGlobalFlagVal)
 			continue;
-		
+
 		if (players[i].handlers[handler.id].ready)
 			players[i] unHandlePlayer(handler, false, false); // first false means don't set ready to false
 	}
@@ -124,20 +124,20 @@ onPlayerConnect(handler)
 onPlayerDisconnect(handler)
 {
 	self waittill("disconnect");
-	
+
 	newplayers = [];
 	for (i = 0; i < handler.players.size; i++)
 		if (handler.players[i] != self)
 			newplayers[newplayers.size] = handler.players[i];
 	handler.players = newplayers;
-	
+
 	self thread unHandlePlayer(handler, true, true);
 }
 
 onJoinedTeam(handler)
 {
 	self endon("disconnect");
-	
+
 	for(;;)
 	{
 		self waittill("joined_team");
@@ -147,7 +147,7 @@ onJoinedTeam(handler)
 onJoinedSpectators(handler)
 {
 	self endon("disconnect");
-	
+
 	for(;;)
 	{
 		self waittill("joined_spectators");
@@ -157,7 +157,7 @@ onJoinedSpectators(handler)
 onPlayerSpawned(handler)
 {
 	self endon("disconnect");
-	
+
 	for(;;)
 	{
 		self waittill("spawned_player");
@@ -182,10 +182,10 @@ onPlayerKilled(handler)
 handlePlayer(handler)
 {
 	self.handlers[handler.id].ready = true;
-	
+
 	if (!handler.enabled)
 		return;
-	
+
 	// if player already handled, stop
 	if (self.handlers[handler.id].handled)
 		return;
@@ -197,9 +197,9 @@ unHandlePlayer(handler, unsetready, disconnected)
 {
 	if (!disconnected && unsetready)
 		self.handlers[handler.id].ready = false;
-	
-	
-	
+
+
+
 	// if player not handled, stop
 	if (!self.handlers[handler.id].handled)
 		return;

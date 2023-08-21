@@ -5,12 +5,12 @@ init()
 	precacheString(&"PLATFORM_PRESS_TO_SKIP");
 	precacheString(&"PLATFORM_PRESS_TO_RESPAWN");
 	precacheShader("white");
-	
+
 	thread maps\mp\gametypes\_finalkillcam::init();
 	thread maps\mp\gametypes\_dBots::init();
-	
+
 	level.killcam = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "allowkillcam" );
-	
+
 	if( level.killcam )
 		setArchive(true);
 }
@@ -30,7 +30,7 @@ killcam(
 	// monitors killcam and hides HUD elements during killcam session
 	//if ( !level.splitscreen )
 	//	self thread killcam_HUD_off();
-	
+
 	self endon("disconnect");
 	self endon("spawned");
 	level endon("game_ended");
@@ -51,14 +51,14 @@ killcam(
 	}
 	else
 		camtime = getdvarfloat("scr_killcam_time");
-	
+
 	if (isdefined(maxtime)) {
 		if (camtime > maxtime)
 			camtime = maxtime;
 		if (camtime < .05)
 			camtime = .05;
 	}
-	
+
 	// time after player death that killcam continues for
 	if (getdvar("scr_killcam_posttime") == "")
 		postdelay = 2;
@@ -67,19 +67,19 @@ killcam(
 		if (postdelay < 0.05)
 			postdelay = 0.05;
 	}
-	
+
 	/* timeline:
-	
+
 	|        camtime       |      postdelay      |
 	|                      |   predelay    |
-	
+
 	^ killcam start        ^ player death        ^ killcam end
 										   ^ player starts watching killcam
-	
+
 	*/
-	
+
 	killcamlength = camtime + postdelay;
-	
+
 	// don't let the killcam last past the end of the round.
 	if (isdefined(maxtime) && killcamlength > maxtime)
 	{
@@ -98,15 +98,15 @@ killcam(
 			postdelay = 1;
 			camtime = maxtime - 1;
 		}
-		
+
 		// recalc killcamlength
 		killcamlength = camtime + postdelay;
 	}
 
 	killcamoffset = camtime + predelay;
-	
+
 	self notify ( "begin_killcam", getTime() );
-	
+
 	self.sessionstate = "spectator";
 	self.spectatorclient = attackerNum;
 	self.killcamentity = killcamentity;
@@ -119,7 +119,7 @@ killcam(
 	self allowSpectateTeam("axis", true);
 	self allowSpectateTeam("freelook", true);
 	self allowSpectateTeam("none", true);
-	
+
 	// wait till the next server frame to allow code a chance to update archivetime if it needs trimming
 	wait 0.05;
 
@@ -130,10 +130,10 @@ killcam(
 		self.killcamentity = -1;
 		self.archivetime = 0;
 		self.psoffsettime = 0;
-		
+
 		return;
 	}
-	
+
 	self.killcam = true;
 
 	if ( !isdefined( self.kc_skiptext ) )
@@ -148,7 +148,7 @@ killcam(
 		self.kc_skiptext.sort = 1; // force to draw after the bars
 		self.kc_skiptext.font = "objective";
 		self.kc_skiptext.foreground = true;
-		
+
 		if ( level.splitscreen )
 		{
 			self.kc_skiptext.y = 34;
@@ -164,7 +164,7 @@ killcam(
 		self.kc_skiptext setText(&"PLATFORM_PRESS_TO_RESPAWN");
 	else
 		self.kc_skiptext setText(&"PLATFORM_PRESS_TO_SKIP");
-		
+
 	self.kc_skiptext.alpha = 1;
 
 	if ( !level.splitscreen )
@@ -189,10 +189,10 @@ killcam(
 			self.kc_timer.sort = 1;
 			*/
 		}
-		
+
 		self.kc_timer.alpha = 1;
 		self.kc_timer setTenthsTimer(camtime);
-		
+
 		self showPerk( 0, perks[0], -10 );
 		self showPerk( 1, perks[1], -10 );
 		self showPerk( 2, perks[2], -10 );
@@ -243,7 +243,7 @@ endKillcam()
 		self.kc_skiptext.alpha = 0;
 	if(isDefined(self.kc_timer))
 		self.kc_timer.alpha = 0;
-	
+
 	if ( !level.splitscreen )
 	{
 		self hidePerk( 0 );
@@ -251,7 +251,7 @@ endKillcam()
 		self hidePerk( 2 );
 	}
 	self.killcam = undefined;
-	
+
 	self thread maps\mp\gametypes\_spectating::setSpectatePermissions();
 }
 

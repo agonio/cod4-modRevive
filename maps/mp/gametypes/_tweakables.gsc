@@ -32,11 +32,11 @@ getTweakableDVarValue( category, name )
 			dVar = undefined;
 			break;
 	}
-	
+
 	assert( isDefined( dVar ) );
-	
+
 	value = getDvarInt( dVar );
-	
+
 	return value;
 }
 
@@ -73,7 +73,7 @@ getTweakableDVar( category, name )
 			value = undefined;
 			break;
 	}
-	
+
 	assert( isDefined( value ) );
 	return value;
 }
@@ -111,7 +111,7 @@ getTweakableValue( category, name )
 			value = undefined;
 			break;
 	}
-	
+
 	assert( isDefined( value ) );
 	return value;
 }
@@ -149,7 +149,7 @@ getTweakableLastValue( category, name )
 			value = undefined;
 			break;
 	}
-	
+
 	assert( isDefined( value ) );
 	return value;
 }
@@ -187,7 +187,7 @@ setTweakableValue( category, name, value )
 			dVar = undefined;
 			break;
 	}
-	
+
 	setDvar( dVar, value );
 }
 
@@ -247,7 +247,7 @@ registerTweakable( category, name, dvar, value )
 	{
 		case "rule":
 			if ( !isDefined( level.rules[name] ) )
-				level.rules[name] = spawnStruct();				
+				level.rules[name] = spawnStruct();
 			level.rules[name].value = value;
 			level.rules[name].lastValue = value;
 			level.rules[name].dVar = dvar;
@@ -256,49 +256,49 @@ registerTweakable( category, name, dvar, value )
 			if ( !isDefined( level.gameTweaks[name] ) )
 				level.gameTweaks[name] = spawnStruct();
 			level.gameTweaks[name].value = value;
-			level.gameTweaks[name].lastValue = value;			
+			level.gameTweaks[name].lastValue = value;
 			level.gameTweaks[name].dVar = dvar;
 			break;
 		case "team":
 			if ( !isDefined( level.teamTweaks[name] ) )
 				level.teamTweaks[name] = spawnStruct();
 			level.teamTweaks[name].value = value;
-			level.teamTweaks[name].lastValue = value;			
+			level.teamTweaks[name].lastValue = value;
 			level.teamTweaks[name].dVar = dvar;
 			break;
 		case "player":
 			if ( !isDefined( level.playerTweaks[name] ) )
 				level.playerTweaks[name] = spawnStruct();
 			level.playerTweaks[name].value = value;
-			level.playerTweaks[name].lastValue = value;			
+			level.playerTweaks[name].lastValue = value;
 			level.playerTweaks[name].dVar = dvar;
 			break;
 		case "class":
 			if ( !isDefined( level.classTweaks[name] ) )
 				level.classTweaks[name] = spawnStruct();
 			level.classTweaks[name].value = value;
-			level.classTweaks[name].lastValue = value;			
+			level.classTweaks[name].lastValue = value;
 			level.classTweaks[name].dVar = dvar;
 			break;
 		case "weapon":
 			if ( !isDefined( level.weaponTweaks[name] ) )
 				level.weaponTweaks[name] = spawnStruct();
 			level.weaponTweaks[name].value = value;
-			level.weaponTweaks[name].lastValue = value;			
+			level.weaponTweaks[name].lastValue = value;
 			level.weaponTweaks[name].dVar = dvar;
 			break;
 		case "hardpoint":
 			if ( !isDefined( level.hardpointTweaks[name] ) )
 				level.hardpointTweaks[name] = spawnStruct();
 			level.hardpointTweaks[name].value = value;
-			level.hardpointTweaks[name].lastValue = value;			
+			level.hardpointTweaks[name].lastValue = value;
 			level.hardpointTweaks[name].dVar = dvar;
 			break;
 		case "hud":
 			if ( !isDefined( level.hudTweaks[name] ) )
 				level.hudTweaks[name] = spawnStruct();
 			level.hudTweaks[name].value = value;
-			level.hudTweaks[name].lastValue = value;			
+			level.hudTweaks[name].lastValue = value;
 			level.hudTweaks[name].dVar = dvar;
 			break;
 	}
@@ -319,7 +319,7 @@ init()
 	level.hardpointTweaks = [];
 	level.hudTweaks = [];
 	// commented out tweaks have not yet been implemented
-	
+
 	registerTweakable( "game", 			"playerwaittime", 		"scr_game_playerwaittime", 			15 ); //*
 	registerTweakable( "game", 			"matchstarttime", 		"scr_game_matchstarttime", 			15 ); //*
 	registerTweakable( "game", 			"roundstarttime", 		"scr_game_roundstarttime", 			5 ); //*
@@ -330,11 +330,11 @@ init()
 	registerTweakable( "game", 			"deathpointloss", 		"scr_game_deathpointloss", 			0 ); //*
 	registerTweakable( "game", 			"suicidepointloss", 	"scr_game_suicidepointloss", 		0 ); //*
 	registerTweakable( "team", 			"teamkillpointloss", 	"scr_team_teamkillpointloss", 		0 ); //*
-	
+
 //	registerTweakable( "team", 			"respawntime", 			"scr_team_respawntime", 			0 );
-	registerTweakable( "team", 			"fftype", 				"scr_team_fftype", 					0 ); 
+	registerTweakable( "team", 			"fftype", 				"scr_team_fftype", 					0 );
 	registerTweakable( "team", 			"teamkillspawndelay", 	"scr_team_teamkillspawndelay", 		0 );
-	
+
 //	registerTweakable( "player", 		"respawndelay", 		"scr_player_respawndelay", 			0 ); //*
 	registerTweakable( "player", 		"maxhealth", 			"scr_player_maxhealth", 			100 ); //*
 	registerTweakable( "player", 		"healthregentime", 		"scr_player_healthregentime", 		5 ); //*
@@ -354,20 +354,17 @@ init()
 	registerTweakable( "hardpoint", "allowuav", 		"scr_hardpoint_allowuav", 1 );
 	registerTweakable( "hardpoint", "allowsupply", 		"scr_hardpoint_allowsupply", 1 );
 	registerTweakable( "hardpoint", "allowhelicopter", 	"scr_hardpoint_allowhelicopter", 1 );
-	
+
 	registerTweakable( "hud", 		"showobjicons", 	"ui_hud_showobjicons", 						1 ); //*
 	setClientTweakable( "hud", 		"showobjicons" );
 
 	level thread updateUITweakables();
 }
 
-
 setClientTweakable( category, name )
 {
 	level.clientTweakables[level.clientTweakables.size] = name;
 }
-
-
 
 updateUITweakables()
 {
@@ -378,14 +375,14 @@ updateUITweakables()
 			clientTweakable = level.clientTweakables[index];
 			curValue = getTweakableDVarValue( "hud", clientTweakable );
 			lastValue = getTweakableLastValue( "hud", clientTweakable );
-			
+
 			if ( curValue != lastValue )
 			{
 				updateServerDvar( getTweakableDvar( "hud", clientTweakable ), curValue );
 				setTweakableLastValue( "hud", clientTweakable, curValue );
 			}
 		}
-			
+
 		wait ( 1.0 );
 	}
 }
