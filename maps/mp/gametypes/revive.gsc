@@ -67,7 +67,6 @@ checkRevive(attacker, sMeansOfDeath)
 		resObjective setWayPoint(true, "revive_icon");
 
 		objId = getNextFreeObjId(); // starts with 6, max is 15; so we have 10 objIds free
-		printAllPlayers("objId = "+ objId +"| player:" + self.name);
 		if (objId != -1 && objId < 16 ) {
 			objective_add(objId, "active", self.body.origin);
 			objective_icon(objId, "revive_icon");
