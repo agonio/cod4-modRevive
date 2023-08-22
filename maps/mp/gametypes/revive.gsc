@@ -5,10 +5,32 @@
 
 setup()
 {
+	level.usedReviveObjIds = [];
+	for (i=0; i<16; i++) {
+		// reserve the first 6 (sd)
+		level.usedReviveObjIds[i] = i<6;
+	}
 	precacheShader("revive_icon");
 
 	thread watchRevives();
 	thread watchPrematch();
+}
+
+getNextFreeObjId()
+{
+	for(i=0; i<level.usedReviveObjIds.size; i++) {
+		if (level.usedReviveObjIds[i] == false) {
+			level.usedReviveObjIds[i] = true; //mark as used and hope that the loop is not running in parallel...
+			return i;
+		}
+	}
+	return -1; // all used, no marker on minimap available
+}
+
+markObjIdUnused(id)
+{
+	level.usedReviveObjIds[id] = false;
+	objective_delete(id);
 }
 
 watchPrematch() {
@@ -44,11 +66,13 @@ checkRevive(attacker, sMeansOfDeath)
 		resObjective = maps\mp\gametypes\_objpoints::createTeamObjpoint( "revive_"+ self.name, self.body.origin + (0,0,32), team, "revive_icon" );
 		resObjective setWayPoint(true, "revive_icon");
 
-		objId = getNextObjID(); // starts with 6, so we have 10 objIds free
-		printMsg(self, "objId = "+ objId);
-		if (objId < 16) {
+		objId = getNextFreeObjId(); // starts with 6, max is 15; so we have 10 objIds free
+		printAllPlayers("objId = "+ objId +"| player:" + self.name);
+		if (objId != -1 && objId < 16 ) {
 			objective_add(objId, "active", self.body.origin);
 			objective_icon(objId, "revive_icon");
+			objective_team(objId, team);
+			resObjective.id = objId;
 		}
 
 		self thread monitorBody(trigger, resObjective);
@@ -116,6 +140,9 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 			wait (0.05);
 			revivePlayer(deadPlayer);
 			trigger delete();
+			if (isdefined(resObjective.id) && resObjective.id != -1) {
+				markObjIdUnused(resObjective.id);
+			}
 			maps\mp\gametypes\_objpoints::deleteObjPoint(resObjective);
 			break;
 		}
