@@ -8,15 +8,18 @@ is a mod for `search&destroy` adding a revive mechanic. It has the following fea
   - a player was revived.
 - integrated the [Final Killcam](https://www.moddb.com/mods/final-killcam) mod created by [FzBr.d4rk](https://www.moddb.com/members/fzbrd4rk) ©
 
+## Usage
+Download the latest version of the mod from the [releases-page](https://github.com/agonio/cod4-modRevive/releases) and extract the content to `<cod-dir>/Mods/ModRevive`. The mod should then appear in your game as 'ModRevive'.
 
+## Development
 
-## Setup
+### Setup
 
 - checkout repo into `<cod-dir>/Mods` (result should be `Mods/modrevive/<files>`)
 - [ModTools](https://wiki.zeroy.com/index.php?title=Call_of_Duty_4:_needed#ModTools) with corresponding [readme](https://www.cod4central.com/content/cod4-mod-tools-readme.txt)
 - [VSCode extension](https://marketplace.visualstudio.com/items?itemName=se2dev.cod-sense) (or similar)
 
-## Build
+### Build
 
 If everything is setup correctly you simply need to run `makeMod.bat`.
 These files should be generated/updated:
@@ -25,17 +28,20 @@ These files should be generated/updated:
 
 ⚠ If the client is still running, only .tmpX files will be generated.
 
-## Run / Test
+### Run / Test
 
-To run the game with the mod, e.g. create a shortcut to the mp bin with following parameters: 
+- Use the artifacts from the 'Build' and launch the game directly with the mod, e.g. create a shortcut to the mp bin with following parameters: 
 
-`"<path_to_iw3mp.exe>" +set developer 1 +set fs_game mods/ModRevive`
+```
+"<path_to_iw3mp.exe>" +set developer 1 +set fs_game mods/ModRevive +set scr_game_matchstarttime 1 +set scr_game_playerwaittime 1 +set scr_game_roundstarttime 1
+```
+\* The three DVARs are not required but recommended for faster testing, as these define the time to wait before the match/round starts.
 
-In the game launch a server with the `sd` gamemode.
+- In the game launch a server with the `sd` gamemode.
 
-For local testing the Final Killcam mod offers the possibility to add Bots. Open console and type `/add_bots X` (X = amount)
+- For local testing the Final Killcam mod offers the possibility to add Bots. Open console and type `/add_bots X` (X = amount)
 
-## Useful links
+### Useful links
 
 - [GSC language Tutorial](https://www.moddb.com/tutorials/scripting-1-basics)
 - [Modding Wiki](https://wiki.zeroy.com/index.php?title=Call_of_Duty_4:_Modding)
