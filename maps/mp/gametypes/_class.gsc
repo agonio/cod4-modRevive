@@ -2,6 +2,7 @@
 // check if below includes are removable
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+#include maps\mp\gametypes\util;
 
 init()
 {
@@ -127,33 +128,41 @@ load_default_loadout( datatable, team, class, stat_num )
 load_default_loadout_raw( class_dataTable, team, class, stat_num )
 {
 	// give primary weapon and attachment
-	primary_attachment = tablelookup( class_dataTable, 1, stat_num + 2, 4 );
+	primary_attachment = classtablelookup( 1, stat_num + 2, 4 );
 	if( primary_attachment != "" && primary_attachment != "none" )
-		level.classWeapons[team][class][0] = tablelookup( class_dataTable, 1, stat_num + 1, 4 ) + "_" + primary_attachment + "_mp";
+		level.classWeapons[team][class][0] = classtablelookup( 1, stat_num + 1, 4 ) + "_" + primary_attachment + "_mp";
 	else
-		level.classWeapons[team][class][0] = tablelookup( class_dataTable, 1, stat_num + 1, 4 ) + "_mp";	
+		level.classWeapons[team][class][0] = classtablelookup( 1, stat_num + 1, 4 ) + "_mp";
 
 	// give secondary weapon and attachment
-	secondary_attachment = tablelookup( class_dataTable, 1, stat_num + 4, 4 );
+	secondary_attachment = classtablelookup( 1, stat_num + 4, 4 );
 	if( secondary_attachment != "" && secondary_attachment != "none" )
-		level.classSidearm[team][class] = tablelookup( class_dataTable, 1, stat_num + 3, 4 ) + "_" + secondary_attachment + "_mp";
+		level.classSidearm[team][class] = classtablelookup( 1, stat_num + 3, 4 ) + "_" + secondary_attachment + "_mp";
 	else
-		level.classSidearm[team][class] = tablelookup( class_dataTable, 1, stat_num + 3, 4 ) + "_mp";	
+		level.classSidearm[team][class] = classtablelookup( 1, stat_num + 3, 4 ) + "_mp";
 		
 	// give frag and special grenades
-	level.classGrenades[class]["primary"]["type"] = tablelookup( class_dataTable, 1, stat_num, 4 ) + "_mp";
-	level.classGrenades[class]["primary"]["count"] = int( tablelookup( class_dataTable, 1, stat_num, 6 ) );
-	level.classGrenades[class]["secondary"]["type"] = tablelookup( class_dataTable, 1, stat_num + 8, 4 ) + "_mp";
-	level.classGrenades[class]["secondary"]["count"] = int( tablelookup( class_dataTable, 1, stat_num + 8, 6 ) );
+	level.classGrenades[class]["primary"]["type"] = classtablelookup( 1, stat_num, 4 ) + "_mp";
+	level.classGrenades[class]["primary"]["count"] = int( classtablelookup( 1, stat_num, 6 ) );
+	level.classGrenades[class]["secondary"]["type"] = classtablelookup( 1, stat_num + 8, 4 ) + "_mp";
+	level.classGrenades[class]["secondary"]["count"] = int( classtablelookup( 1, stat_num + 8, 6 ) );
 	
 	// give default class perks
 	level.default_perk[class] = [];	
-	level.default_perk[class][0] = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
-	level.default_perk[class][1] = tablelookup( class_dataTable, 1, stat_num + 6, 4 );
-	level.default_perk[class][2] = tablelookup( class_dataTable, 1, stat_num + 7, 4 );
+	level.default_perk[class][0] = classtablelookup( 1, stat_num + 5, 4 );
+	perk1 = classtablelookup( 1, stat_num + 6, 4 );
+	if (perk1 == "specialty_bulletdamage") {
+		if(class == "CLASS_ASSAULT") {
+			perk1 = "specialty_fastreload";
+		} else if (class == "CLASS_SNIPER") {
+			perk1 = "specialty_gpsjammer";
+		}
+	}
+	level.default_perk[class][1] = perk1;
+	level.default_perk[class][2] = classtablelookup( 1, stat_num + 7, 4 );
 	
 	// give all inventory
-	inventory_ref = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
+	inventory_ref = classtablelookup( 1, stat_num + 5, 4 );
 	if( isdefined( inventory_ref ) && tablelookup( "mp/statsTable.csv", 6, inventory_ref, 2 ) == "inventory" )
 	{
 		inventory_count = int( tablelookup( "mp/statsTable.csv", 6, inventory_ref, 5 ) );
@@ -275,12 +284,12 @@ cac_init()
 	level.allowedPerks[0][ 5] = perkReferenceToIndex[ "specialty_specialgrenade" ];
 	level.allowedPerks[0][ 6] = perkReferenceToIndex[ "specialty_weapon_rpg" ];
 	level.allowedPerks[0][ 7] = perkReferenceToIndex[ "specialty_weapon_claymore" ];
-	level.allowedPerks[0][ 8] = perkReferenceToIndex[ "specialty_fraggrenade" ];
+	level.allowedPerks[0][ 8] = 190;	//perkReferenceToIndex[ "specialty_fraggrenade" ];
 	level.allowedPerks[0][ 9] = perkReferenceToIndex[ "specialty_extraammo" ];
 	level.allowedPerks[0][10] = perkReferenceToIndex[ "specialty_detectexplosive" ];
 	
 	level.allowedPerks[1][ 0] = 190;
-	level.allowedPerks[1][ 1] = perkReferenceToIndex[ "specialty_bulletdamage" ];
+	level.allowedPerks[1][ 1] = 190;	//perkReferenceToIndex[ "specialty_bulletdamage" ];
 	level.allowedPerks[1][ 2] = perkReferenceToIndex[ "specialty_armorvest" ];
 	level.allowedPerks[1][ 3] = perkReferenceToIndex[ "specialty_fastreload" ];
 	level.allowedPerks[1][ 4] = perkReferenceToIndex[ "specialty_rof" ];
@@ -292,7 +301,7 @@ cac_init()
 	level.allowedPerks[2][ 1] = perkReferenceToIndex[ "specialty_longersprint" ];
 	level.allowedPerks[2][ 2] = perkReferenceToIndex[ "specialty_bulletaccuracy" ];
 	level.allowedPerks[2][ 3] = perkReferenceToIndex[ "specialty_pistoldeath" ];
-	level.allowedPerks[2][ 4] = perkReferenceToIndex[ "specialty_grenadepulldeath" ];
+	level.allowedPerks[2][ 4] = 190;	//perkReferenceToIndex[ "specialty_grenadepulldeath" ];
 	level.allowedPerks[2][ 5] = perkReferenceToIndex[ "specialty_bulletpenetration" ];
 	level.allowedPerks[2][ 6] = perkReferenceToIndex[ "specialty_holdbreath" ];
 	level.allowedPerks[2][ 7] = perkReferenceToIndex[ "specialty_quieter" ];
@@ -498,6 +507,7 @@ validatePerk( perkIndex, perkSlotIndex )
 			return perkIndex;
 	}
 	println( "^1Warning: (" + self.name + ") Perk " + level.tbl_PerkData[perkIndex]["reference_full"] + " is not allowed for perk slot index " + perkSlotIndex + "; replacing with no perk" );
+	printMsg(self, "^3Warning: ^7Perk ^2" + level.tbl_PerkData[perkIndex]["reference_full"] + "^7 is not allowed and will be removed!" );
 	return 190;
 }
 
@@ -581,13 +591,13 @@ get_specialtydata( class_num, specialty )
 	}
 }
 
-/* interface function for code table lookup using class table data
-classtablelookup( get_col, with_col, with_data )
+classtablelookup( with_col, with_data, get_col )
 {
 	return_value = tablelookup( "mp/classtable.csv", with_col, with_data, get_col );
 	assertex( isdefined( return_value ), "Data not found: "+get_col+" column, using "+with_data+" in the "+with_col+"th column. ");
 	return return_value;	
 }
+/* interface function for code table lookup using class table data
 
 // interface function for code table lookup using weapon attachment table data
 attachmenttablelookup( get_col, with_col, with_data )
