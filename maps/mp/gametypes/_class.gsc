@@ -765,14 +765,12 @@ giveLoadout( team, class )
 		// ============= selected one of the default classes ==============
 				
 		// load the selected default class's specialties
-		assertex( isdefined(self.pers["class"]), "Player during spawn and loadout got no class!" );
-		selected_class = self.pers["class"];
-		specialty_size = level.default_perk[selected_class].size;
+		specialty_size = level.default_perk[class].size;
 		
 		for( i = 0; i < specialty_size; i++ )
 		{
-			if( isdefined( level.default_perk[selected_class][i] ) && level.default_perk[selected_class][i] != "" )
-				self.specialty[self.specialty.size] = level.default_perk[selected_class][i];
+			if( isdefined( level.default_perk[class][i] ) && level.default_perk[class][i] != "" )
+				self.specialty[self.specialty.size] = level.default_perk[class][i];
 		}
 		assertex( isdefined( self.specialty ) && self.specialty.size > 0, "Default class: " + self.pers["class"] + " is missing specialties " );
 		
