@@ -53,6 +53,7 @@ watchRevives() {
 checkRevive(attacker, sMeansOfDeath)
 {
 	wait ( 0.05 );
+	self.deathClass = self.lastClass;
 
 	printAliveCount();
 
@@ -158,17 +159,31 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 
 revivePlayer( deadPlayer )
 {
-	deadPlayer maps\mp\gametypes\_globallogic::spawnPlayer();
+	deadPlayer maps\mp\gametypes\_globallogic::_spawnPlayer(deadPlayer.deathClass);
 	deadPlayer.reviveCount++;
 	deadPlayer.health = 10;
-	deadPlayer spawn(deadPlayer.body.origin, deadPlayer.angles);
-	deadPlayer maps\mp\gametypes\_class::giveLoadout( deadPlayer.team, deadPlayer.class );
+	deadPlayer SetOrigin(deadPlayer.body.origin);
+	deadPlayer SetPlayerAngles(deadPlayer.angles);
+
+	//remove primary, to give dropped weapon
+	deadPlayer TakeWeapon(deadPlayer getPrimaryWeapon(deadPlayer.deathClass));
+	groundweapon = "";
+	if(isdefined(deadPlayer.droppedDeathItem)) {
+		groundweapon = deadPlayer.droppedDeathItem maps\mp\gametypes\_weapons::getItemWeaponName();
+		deadPlayer.droppedDeathItem delete();
+		deadPlayer GiveWeapon(groundweapon);
+	}
 
 	level notify("player_revived");
 	deadPlayer notify("revived");
 
 	deadPlayer.body delete();
 	wait 0.05;
+	if(groundweapon != "") {
+		deadPlayer SwitchToWeapon(groundweapon);
+	} else {
+		deadPlayer SwitchToWeapon(deadPlayer getSecondaryWeapon(deadPlayer.deathClass));
+	}
 	deadPlayer.health = getMaxHealth();
 	deadPlayer playLocalSound( "tacotruck" );
 }
