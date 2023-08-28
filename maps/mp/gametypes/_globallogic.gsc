@@ -566,8 +566,12 @@ matchStartTimerSkip()
 	visionSetNaked( getDvar( "mapname" ), 0 );
 }
 
-
 spawnPlayer()
+{
+	_spawnPlayer(self.class);
+}
+
+_spawnPlayer(newClass)
 {
 	prof_begin( "spawnPlayer_preUTS" );
 
@@ -637,16 +641,16 @@ spawnPlayer()
 
 	if ( level.oldschool )
 	{
-		assert( !isDefined( self.class ) );
+		assert( !isDefined( newClass ) );
 		self maps\mp\gametypes\_oldschool::giveLoadout();
 		self maps\mp\gametypes\_class::setClass( level.defaultClass );
 	}
 	else
 	{
-		assert( isValidClass( self.class ) );
+		assert( isValidClass( newClass ) );
 
-		self maps\mp\gametypes\_class::setClass( self.class );
-		self maps\mp\gametypes\_class::giveLoadout( self.team, self.class );
+		self maps\mp\gametypes\_class::setClass( newClass );
+		self maps\mp\gametypes\_class::giveLoadout( self.team, newClass );
 	}
 
 	if ( level.inPrematchPeriod )
