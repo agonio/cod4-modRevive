@@ -283,7 +283,7 @@ deletePickupAfterAWhile()
 {
 	self endon("death");
 
-	wait 60;
+	wait 180;
 
 	if ( !isDefined( self ) )
 		return;
