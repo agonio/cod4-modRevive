@@ -1,11 +1,13 @@
 #include common_scripts\utility;
+#include maps\mp\gametypes\util;
+#include maps\mp\gametypes\perks;
 // check if below includes are removable
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
-#include maps\mp\gametypes\util;
 
 init()
 {
+	maps\mp\gametypes\perks::setup();
 	level.classMap["assault_mp"] = "CLASS_ASSAULT";
 	level.classMap["specops_mp"] = "CLASS_SPECOPS";
 	level.classMap["heavygunner_mp"] = "CLASS_HEAVYGUNNER";
@@ -150,6 +152,8 @@ load_default_loadout_raw( class_dataTable, team, class, stat_num )
 	// give default class perks
 	level.default_perk[class] = [];	
 	level.default_perk[class][0] = classtablelookup( 1, stat_num + 5, 4 );
+
+	//***HACK:
 	perk1 = classtablelookup( 1, stat_num + 6, 4 );
 	if (perk1 == "specialty_bulletdamage") {
 		if(class == "CLASS_ASSAULT") {
@@ -159,6 +163,8 @@ load_default_loadout_raw( class_dataTable, team, class, stat_num )
 		}
 	}
 	level.default_perk[class][1] = perk1;
+	//***HACK_END
+
 	level.default_perk[class][2] = classtablelookup( 1, stat_num + 7, 4 );
 	
 	// give all inventory
@@ -280,32 +286,32 @@ cac_init()
 	level.allowedPerks[0][ 1] = 191;
 	level.allowedPerks[0][ 2] = 192;
 	level.allowedPerks[0][ 3] = 193;
-	level.allowedPerks[0][ 4] = perkReferenceToIndex[ "specialty_weapon_c4" ];
-	level.allowedPerks[0][ 5] = perkReferenceToIndex[ "specialty_specialgrenade" ];
-	level.allowedPerks[0][ 6] = perkReferenceToIndex[ "specialty_weapon_rpg" ];
-	level.allowedPerks[0][ 7] = perkReferenceToIndex[ "specialty_weapon_claymore" ];
-	level.allowedPerks[0][ 8] = 190;	//perkReferenceToIndex[ "specialty_fraggrenade" ];
-	level.allowedPerks[0][ 9] = perkReferenceToIndex[ "specialty_extraammo" ];
-	level.allowedPerks[0][10] = perkReferenceToIndex[ "specialty_detectexplosive" ];
+	level.allowedPerks[0][ 4] = perkIndexIfAllowed("specialty_weapon_c4", perkReferenceToIndex);
+	level.allowedPerks[0][ 5] = perkIndexIfAllowed("specialty_specialgrenade", perkReferenceToIndex);
+	level.allowedPerks[0][ 6] = perkIndexIfAllowed("specialty_weapon_rpg", perkReferenceToIndex);
+	level.allowedPerks[0][ 7] = perkIndexIfAllowed("specialty_weapon_claymore", perkReferenceToIndex);
+	level.allowedPerks[0][ 8] = perkIndexIfAllowed("specialty_fraggrenade", perkReferenceToIndex);
+	level.allowedPerks[0][ 9] = perkIndexIfAllowed("specialty_extraammo", perkReferenceToIndex);
+	level.allowedPerks[0][10] = perkIndexIfAllowed("specialty_detectexplosive", perkReferenceToIndex);
 	
 	level.allowedPerks[1][ 0] = 190;
-	level.allowedPerks[1][ 1] = 190;	//perkReferenceToIndex[ "specialty_bulletdamage" ];
-	level.allowedPerks[1][ 2] = perkReferenceToIndex[ "specialty_armorvest" ];
-	level.allowedPerks[1][ 3] = perkReferenceToIndex[ "specialty_fastreload" ];
-	level.allowedPerks[1][ 4] = perkReferenceToIndex[ "specialty_rof" ];
-	level.allowedPerks[1][ 5] = perkReferenceToIndex[ "specialty_twoprimaries" ];
-	level.allowedPerks[1][ 6] = perkReferenceToIndex[ "specialty_gpsjammer" ];
-	level.allowedPerks[1][ 7] = perkReferenceToIndex[ "specialty_explosivedamage" ];
+	level.allowedPerks[1][ 1] = perkIndexIfAllowed("specialty_bulletdamage", perkReferenceToIndex);
+	level.allowedPerks[1][ 2] = perkIndexIfAllowed("specialty_armorvest", perkReferenceToIndex);
+	level.allowedPerks[1][ 3] = perkIndexIfAllowed("specialty_fastreload", perkReferenceToIndex);
+	level.allowedPerks[1][ 4] = perkIndexIfAllowed("specialty_rof", perkReferenceToIndex);
+	level.allowedPerks[1][ 5] = perkIndexIfAllowed("specialty_twoprimaries", perkReferenceToIndex);
+	level.allowedPerks[1][ 6] = perkIndexIfAllowed("specialty_gpsjammer", perkReferenceToIndex);
+	level.allowedPerks[1][ 7] = perkIndexIfAllowed("specialty_explosivedamage", perkReferenceToIndex);
 	
 	level.allowedPerks[2][ 0] = 190;
-	level.allowedPerks[2][ 1] = perkReferenceToIndex[ "specialty_longersprint" ];
-	level.allowedPerks[2][ 2] = perkReferenceToIndex[ "specialty_bulletaccuracy" ];
-	level.allowedPerks[2][ 3] = perkReferenceToIndex[ "specialty_pistoldeath" ];
-	level.allowedPerks[2][ 4] = 190;	//perkReferenceToIndex[ "specialty_grenadepulldeath" ];
-	level.allowedPerks[2][ 5] = perkReferenceToIndex[ "specialty_bulletpenetration" ];
-	level.allowedPerks[2][ 6] = perkReferenceToIndex[ "specialty_holdbreath" ];
-	level.allowedPerks[2][ 7] = perkReferenceToIndex[ "specialty_quieter" ];
-	level.allowedPerks[2][ 8] = perkReferenceToIndex[ "specialty_parabolic" ];
+	level.allowedPerks[2][ 1] = perkIndexIfAllowed("specialty_longersprint", perkReferenceToIndex);
+	level.allowedPerks[2][ 2] = perkIndexIfAllowed("specialty_bulletaccuracy", perkReferenceToIndex);
+	level.allowedPerks[2][ 3] = perkIndexIfAllowed("specialty_pistoldeath", perkReferenceToIndex);
+	level.allowedPerks[2][ 4] = perkIndexIfAllowed("specialty_grenadepulldeath", perkReferenceToIndex);
+	level.allowedPerks[2][ 5] = perkIndexIfAllowed("specialty_bulletpenetration", perkReferenceToIndex);
+	level.allowedPerks[2][ 6] = perkIndexIfAllowed("specialty_holdbreath", perkReferenceToIndex);
+	level.allowedPerks[2][ 7] = perkIndexIfAllowed("specialty_quieter", perkReferenceToIndex);
+	level.allowedPerks[2][ 8] = perkIndexIfAllowed("specialty_parabolic", perkReferenceToIndex);
 }
 
 getClassChoice( response )
