@@ -98,6 +98,7 @@ saveOldLoadout() {
 	self.secondaryClipAmmo = 0;
 	self.secondaryStockAmmo = 0;
 	if(self.secondary != "") { // might be dropped instead of primary
+		self.secondary = removeGl(secondary);
 		self.secondaryClipAmmo = self GetWeaponAmmoClip(self.secondary);
 		self.secondaryStockAmmo = self GetWeaponAmmoStock(self.secondary);
 	}
