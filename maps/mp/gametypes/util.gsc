@@ -1,6 +1,15 @@
 #include common_scripts\utility;
 #include maps\mp\_utility;
 
+removeGl(weapon) {
+	for( i = 0 ; i < weapon.size - 2 ; i ++ ) {
+		if(weapon[i] == "_" && weapon[i+1] == "g" && weapon[i+2] == "l") {
+			return getSubStr(weapon, 0, i) + "_mp";
+		}
+	}
+	return weapon;
+}
+
 printMsg(pl, msg)
 {
 	pl IprintLnBold(msg);
@@ -31,38 +40,69 @@ printTeam(msg, team)
 	}
 }
 
+// gets custom class struct
+getCustomClassStruct(class) {
+	// gets custom class data from stat bytes, if necessary
+	self maps\mp\gametypes\_class::cac_getdata();
+
+	// obtains the custom class number
+	class_num = int( class[class.size-1] )-1;
+
+	return self.custom_class[class_num];
+}
+
 getPrimaryWeapon(class) {
-	// ============= custom class selected ==============
 	if( isSubstr( class, "CLASS_CUSTOM" ) )
 	{
-		// gets custom class data from stat bytes, if necessary
-		self maps\mp\gametypes\_class::cac_getdata();
+		classStruct = self getCustomClassStruct(class);
 
-		// obtains the custom class number
-		class_num = int( class[class.size-1] )-1;
-
-		return self.custom_class[class_num]["primary"];
-
-	// ============= default class selected ==============
-	} else	{
+		return classStruct["primary"];
+	} else {
 		return level.classWeapons["allies"][class][0];
 	}
 }
 
 getSecondaryWeapon(class) {
-	// ============= custom class selected ==============
 	if( isSubstr( class, "CLASS_CUSTOM" ) )
 	{
-		// gets custom class data from stat bytes, if necessary
-		self maps\mp\gametypes\_class::cac_getdata();
+		classStruct = self getCustomClassStruct(class);
 
-		// obtains the custom class number
-		class_num = int( class[class.size-1] )-1;
-
-		return self.custom_class[class_num]["secondary"];
-
-	// ============= default class selected ==============
-	} else	{
+		return classStruct["secondary"];
+	} else {
 		return level.classSidearm["allies"][class];
+	}
+}
+
+//rpg, c4, claymore
+getInventoryWeapon(class) {
+	if( isSubstr( class, "CLASS_CUSTOM" ) )
+	{
+		classStruct = self getCustomClassStruct(class);
+
+		return classStruct["inventory"];
+	} else {
+		return level.classItem["allies"][class]["type"];
+	}
+}
+
+getGrenadeWeapon(class) {
+	if( isSubstr( class, "CLASS_CUSTOM" ) )
+	{
+		classStruct = self getCustomClassStruct(class);
+
+		return classStruct["grenades"];
+	} else {
+		return level.classGrenades[class]["primary"]["type"];
+	}
+}
+
+getSpecialNadeWeapon(class) {
+	if( isSubstr( class, "CLASS_CUSTOM" ) )
+	{
+		classStruct = self getCustomClassStruct(class);
+
+		return classStruct["specialgrenades"];
+	} else {
+		return level.classGrenades[class]["secondary"]["type"];
 	}
 }

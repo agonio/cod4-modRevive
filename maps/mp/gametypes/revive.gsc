@@ -53,14 +53,15 @@ watchRevives() {
 checkRevive(attacker, sMeansOfDeath)
 {
 	wait ( 0.05 );
-	self.deathClass = self.lastClass;
+
+	self saveOldLoadout();
 
 	printAliveCount();
 
 	// wait for body's final position
 	wait(1.5);
 
-	trigger = spawn( "trigger_radius", self.body.origin, 0, 45 , 45 );
+	trigger = spawn( "trigger_radius", self.body.origin, 0, 50 , 50 );
 
 	team = self.pers["team"];
 	if ( isDefined( team ) && (team == "allies" || team == "axis") )
@@ -77,6 +78,28 @@ checkRevive(attacker, sMeansOfDeath)
 		}
 
 		self thread monitorBody(trigger, resObjective);
+	}
+}
+
+saveOldLoadout() {
+	self.deathClass = self.lastClass;
+	self.invWeapon = self getInventoryWeapon(self.deathClass);
+	self.nade = self getGrenadeWeapon(self.deathClass);
+	self.spec = self getSpecialNadeWeapon(self.deathClass);
+	self.secondary = self getSecondaryWeapon(self.deathClass);
+
+	self.invAmmo = 0;
+	if(self.invWeapon != "") {
+		self.invAmmo = self GetWeaponAmmoClip(self.invWeapon);
+	}
+	self.nadeAmmo = self GetWeaponAmmoClip(self.nade);
+	self.specAmmo = self GetWeaponAmmoClip(self.spec);
+
+	self.secondaryClipAmmo = 0;
+	self.secondaryStockAmmo = 0;
+	if(self.secondary != "") { // might be dropped instead of primary
+		self.secondaryClipAmmo = self GetWeaponAmmoClip(self.secondary);
+		self.secondaryStockAmmo = self GetWeaponAmmoStock(self.secondary);
 	}
 }
 
@@ -171,7 +194,12 @@ revivePlayer( deadPlayer )
 	if(isdefined(deadPlayer.droppedDeathItem)) {
 		groundweapon = deadPlayer.droppedDeathItem maps\mp\gametypes\_weapons::getItemWeaponName();
 		deadPlayer.droppedDeathItem delete();
+		groundweapon = removeGl(groundweapon); // avoid regain of gl ammo
 		deadPlayer GiveWeapon(groundweapon);
+	}
+	deadPlayer givePreviousLoadout();
+	if(groundweapon != "" && deadPlayer GetWeaponAmmoStock(groundweapon) <= 0){
+		deadPlayer GiveStartAmmo(groundweapon); // avoid no ammo on secondary bug
 	}
 
 	level notify("player_revived");
@@ -188,6 +216,18 @@ revivePlayer( deadPlayer )
 	deadPlayer playLocalSound( "tacotruck" );
 }
 
+givePreviousLoadout() {
+	self setPreviousAmmo(self.invWeapon, self.invAmmo);
+	self setPreviousAmmo(self.nade, self.nadeAmmo);
+	self setPreviousAmmo(self.spec, self.specAmmo);
+	self setPreviousAmmo(self.secondary, self.secondaryClipAmmo + self.secondaryStockAmmo);
+}
+
+setPreviousAmmo(weapon, ammo) {
+	if(weapon != "") {
+		self maps\mp\gametypes\_class::setWeaponAmmoOverall( weapon, ammo );
+	}
+}
 
 printAliveCount()
 {
