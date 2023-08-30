@@ -1,15 +1,25 @@
 # cod4-modRevive
 is a mod for `search&destroy` adding a revive mechanic. It has the following features:
 
-- nearby players can revive team-mates after they've been killed in sd
+- nearby players can revive team-mates after they've been killed
 - display the current amount of players per team alive, when..
   - a new round started,
   - a player was killed,
   - a player was revived.
+- manage the available perks via DVARs - `perk_forbid_specialty_<perkname> 1`
 - integrated the [Final Killcam](https://www.moddb.com/mods/final-killcam) mod created by [FzBr.d4rk](https://www.moddb.com/members/fzbrd4rk) ©
 
 ## Usage
 Download the latest version of the mod from the [releases-page](https://github.com/agonio/cod4-modRevive/releases) and extract the content to `<cod-dir>/Mods/ModRevive`. The mod should then appear in your game as 'ModRevive'.
+
+### Customization
+There are several DVARs to customize the ModRevive experience:
+
+- `perk_forbid_specialty_<perkname>`: allows to control which perks are allowed on the server; default: 0 (allowed)
+- `scr_player_revivetime`: basic revive time; default: 3000 (ms)
+- `scr_player_revivetimeincrease`: additional time per prior successful revive; default: 1000 (ms)
+- `scr_game_roundstarttime`: time in seconds to wait before each round; default: 5 (s)
+
 
 ## Development
 
