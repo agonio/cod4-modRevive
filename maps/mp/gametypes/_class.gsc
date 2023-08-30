@@ -130,31 +130,31 @@ load_default_loadout( datatable, team, class, stat_num )
 load_default_loadout_raw( class_dataTable, team, class, stat_num )
 {
 	// give primary weapon and attachment
-	primary_attachment = classtablelookup( 1, stat_num + 2, 4 );
+	primary_attachment = tablelookup( class_dataTable, 1, stat_num + 2, 4 );
 	if( primary_attachment != "" && primary_attachment != "none" )
-		level.classWeapons[team][class][0] = classtablelookup( 1, stat_num + 1, 4 ) + "_" + primary_attachment + "_mp";
+		level.classWeapons[team][class][0] = tablelookup( class_dataTable, 1, stat_num + 1, 4 ) + "_" + primary_attachment + "_mp";
 	else
-		level.classWeapons[team][class][0] = classtablelookup( 1, stat_num + 1, 4 ) + "_mp";
+		level.classWeapons[team][class][0] = tablelookup( class_dataTable, 1, stat_num + 1, 4 ) + "_mp";
 
 	// give secondary weapon and attachment
-	secondary_attachment = classtablelookup( 1, stat_num + 4, 4 );
+	secondary_attachment = tablelookup( class_dataTable, 1, stat_num + 4, 4 );
 	if( secondary_attachment != "" && secondary_attachment != "none" )
-		level.classSidearm[team][class] = classtablelookup( 1, stat_num + 3, 4 ) + "_" + secondary_attachment + "_mp";
+		level.classSidearm[team][class] = tablelookup( class_dataTable, 1, stat_num + 3, 4 ) + "_" + secondary_attachment + "_mp";
 	else
-		level.classSidearm[team][class] = classtablelookup( 1, stat_num + 3, 4 ) + "_mp";
+		level.classSidearm[team][class] = tablelookup( class_dataTable, 1, stat_num + 3, 4 ) + "_mp";
 		
 	// give frag and special grenades
-	level.classGrenades[class]["primary"]["type"] = classtablelookup( 1, stat_num, 4 ) + "_mp";
-	level.classGrenades[class]["primary"]["count"] = int( classtablelookup( 1, stat_num, 6 ) );
-	level.classGrenades[class]["secondary"]["type"] = classtablelookup( 1, stat_num + 8, 4 ) + "_mp";
-	level.classGrenades[class]["secondary"]["count"] = int( classtablelookup( 1, stat_num + 8, 6 ) );
+	level.classGrenades[class]["primary"]["type"] = tablelookup( class_dataTable, 1, stat_num, 4 ) + "_mp";
+	level.classGrenades[class]["primary"]["count"] = int( tablelookup( class_dataTable, 1, stat_num, 6 ) );
+	level.classGrenades[class]["secondary"]["type"] = tablelookup( class_dataTable, 1, stat_num + 8, 4 ) + "_mp";
+	level.classGrenades[class]["secondary"]["count"] = int( tablelookup( class_dataTable, 1, stat_num + 8, 6 ) );
 	
 	// give default class perks
 	level.default_perk[class] = [];	
-	level.default_perk[class][0] = classtablelookup( 1, stat_num + 5, 4 );
+	level.default_perk[class][0] = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
 
 	//***HACK:
-	perk1 = classtablelookup( 1, stat_num + 6, 4 );
+	perk1 = tablelookup( class_dataTable, 1, stat_num + 6, 4 );
 	if (perk1 == "specialty_bulletdamage") {
 		if(class == "CLASS_ASSAULT") {
 			perk1 = "specialty_fastreload";
@@ -165,10 +165,10 @@ load_default_loadout_raw( class_dataTable, team, class, stat_num )
 	level.default_perk[class][1] = perk1;
 	//***HACK_END
 
-	level.default_perk[class][2] = classtablelookup( 1, stat_num + 7, 4 );
+	level.default_perk[class][2] = tablelookup( class_dataTable, 1, stat_num + 7, 4 );
 	
 	// give all inventory
-	inventory_ref = classtablelookup( 1, stat_num + 5, 4 );
+	inventory_ref = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
 	if( isdefined( inventory_ref ) && tablelookup( "mp/statsTable.csv", 6, inventory_ref, 2 ) == "inventory" )
 	{
 		inventory_count = int( tablelookup( "mp/statsTable.csv", 6, inventory_ref, 5 ) );
@@ -597,13 +597,13 @@ get_specialtydata( class_num, specialty )
 	}
 }
 
+/* interface function for code table lookup using class table data
 classtablelookup( with_col, with_data, get_col )
 {
 	return_value = tablelookup( "mp/classtable.csv", with_col, with_data, get_col );
 	assertex( isdefined( return_value ), "Data not found: "+get_col+" column, using "+with_data+" in the "+with_col+"th column. ");
 	return return_value;	
 }
-/* interface function for code table lookup using class table data
 
 // interface function for code table lookup using weapon attachment table data
 attachmenttablelookup( get_col, with_col, with_data )

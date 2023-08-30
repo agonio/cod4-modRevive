@@ -568,7 +568,7 @@ matchStartTimerSkip()
 
 spawnPlayer()
 {
-	_spawnPlayer(self.class);
+	self _spawnPlayer(self.class);
 }
 
 _spawnPlayer(newClass)
