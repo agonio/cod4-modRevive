@@ -98,7 +98,6 @@ saveOldLoadout() {
 	self.secondaryClipAmmo = 0;
 	self.secondaryStockAmmo = 0;
 	if(self.secondary != "") { // might be dropped instead of primary
-		self.secondary = removeGl(secondary);
 		self.secondaryClipAmmo = self GetWeaponAmmoClip(self.secondary);
 		self.secondaryStockAmmo = self GetWeaponAmmoStock(self.secondary);
 	}
@@ -188,6 +187,12 @@ revivePlayer( deadPlayer )
 	deadPlayer.health = 10;
 	deadPlayer SetOrigin(deadPlayer.body.origin);
 	deadPlayer SetPlayerAngles(deadPlayer.angles);
+
+	//remove potential gl from secondary
+	secondary = deadPlayer getSecondaryWeapon(deadPlayer.deathClass);
+	deadPlayer TakeWeapon(secondary);
+	secondary = removeGl(secondary);
+	deadPlayer GiveWeapon(secondary);
 
 	//remove primary, to give dropped weapon
 	deadPlayer TakeWeapon(deadPlayer getPrimaryWeapon(deadPlayer.deathClass));
