@@ -91,6 +91,7 @@ saveOldLoadout() {
 	self.invAmmo = 0;
 	if(self.invWeapon != "") {
 		self.invAmmo = self GetWeaponAmmoClip(self.invWeapon);
+		self.invAmmo += self GetWeaponAmmoStock(self.invWeapon);
 	}
 	self.nadeAmmo = self GetWeaponAmmoClip(self.nade);
 	self.specAmmo = self GetWeaponAmmoClip(self.spec);
