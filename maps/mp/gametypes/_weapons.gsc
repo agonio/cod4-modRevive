@@ -68,9 +68,16 @@ init()
 	// based on weaponList array, precache weapons in list
 	for ( index = 0; index < level.weaponList.size; index++ )
 	{
+		if(isSubstr(level.weaponList[index], "m16")) // fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
+            continue;
+
 		precacheItem( level.weaponList[index] );
 		println( "Precached weapon: " + level.weaponList[index] );
 	}
+	precacheItem( "m16_mp" );
+    precacheItem( "m16_reflex_mp" );
+    precacheItem( "m16_silencer_mp" );
+    precacheItem( "m16_gl_mp" );
 
 	precacheItem( "frag_grenade_short_mp" );
 
