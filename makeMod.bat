@@ -2,6 +2,7 @@ del z_modrevive.iwd
 del mod.ff
 
 xcopy ui_mp ..\..\raw\ui_mp /SY
+xcopy ui ..\..\raw\ui /SY
 xcopy maps ..\..\raw\maps /SY
 xcopy soundaliases ..\..\raw\soundaliases /SY
 xcopy sound ..\..\raw\sound /SY
