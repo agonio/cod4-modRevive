@@ -70,14 +70,26 @@ init()
 	{
 		if(isSubstr(level.weaponList[index], "m16")) // fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
             continue;
+		if(isSubstr(level.weaponList[index], "m4")) // fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp"
+            continue;
 
 		precacheItem( level.weaponList[index] );
 		println( "Precached weapon: " + level.weaponList[index] );
 	}
-	precacheItem( "m16_mp" );
-    precacheItem( "m16_reflex_mp" );
-    precacheItem( "m16_silencer_mp" );
-    precacheItem( "m16_gl_mp" );
+
+	brokenweapons = [];
+	brokenweapons[0] = "m16";
+	brokenweapons[1] = "m4";
+
+	for ( index = 0; index < brokenweapons.size; index++ )
+	{
+		precacheItem( brokenweapons[index] + "_mp" );
+		precacheItem( brokenweapons[index] + "_reflex_mp" );
+		precacheItem( brokenweapons[index] + "_silencer_mp" );
+		precacheItem( brokenweapons[index] + "_gl_mp" );
+		precacheItem( brokenweapons[index] + "_acog_mp" );
+	}
+
 
 	precacheItem( "frag_grenade_short_mp" );
 
