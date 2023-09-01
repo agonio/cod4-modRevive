@@ -2,6 +2,17 @@ menufile,ui_mp/scriptmenus/changeclass_marines_mw.menu
 menufile,ui_mp/scriptmenus/changeclass_opfor_mw.menu
 menufile,ui_mp/scriptmenus/changeclass_mw.menu
 menufile,ui_mp/main.menu
+menufile,ui_mp/challenges.menu
+menufile,ui_mp/createserver.menu
+menufile,ui_mp/pc_joinchoosegamemode.menu
+menufile,ui_mp/settings_quick_war.menu
+menufile,ui_mp/settings_quick_sd.menu
+menufile,ui_mp/settings_quick_dm.menu
+menufile,ui_mp/settings_quick_dom.menu
+menufile,ui_mp/settings_quick_koth.menu
+menufile,ui_mp/settings_quick_sab.menu
+menufile,ui/playerprofile.menu
+
 rawfile,maps/mp/gametypes/_dBots.gsc
 rawfile,maps/mp/gametypes/_class.gsc
 rawfile,maps/mp/gametypes/perks.gsc
@@ -18,6 +29,7 @@ rawfile,maps/mp/gametypes/revive.gsc
 rawfile,maps/mp/gametypes/sab.gsc
 rawfile,maps/mp/gametypes/sd.gsc
 rawfile,maps/mp/gametypes/war.gsc
+
 image,logo_cod2
 image,revive_icon
 material,revive_icon
