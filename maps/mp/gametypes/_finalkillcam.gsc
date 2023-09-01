@@ -230,7 +230,7 @@ CreateFKMenu( victim , attacker)
 
 onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration)
 {
-	if(isdefined(attacker) && attacker != self && sMeansOfDeath != "MOD_TRIGGER_HURT") //fall damage
+	if(isdefined(attacker) && attacker != self && sMeansOfDeath != "MOD_TRIGGER_HURT" && sMeansOfDeath != "MOD_FALLING") //fall damage
 	{
 		level.showFinalKillcam = true;
 

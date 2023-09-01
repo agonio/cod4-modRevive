@@ -91,7 +91,10 @@ saveOldLoadout() {
 	self.invAmmo = 0;
 	if(self.invWeapon != "") {
 		self.invAmmo = self GetWeaponAmmoClip(self.invWeapon);
-		self.invAmmo += self GetWeaponAmmoStock(self.invWeapon);
+		if ( !isWeaponClipOnly( self.invWeapon ) )
+		{
+			self.invAmmo += self GetWeaponAmmoStock(self.invWeapon);
+		}
 	}
 	self.nadeAmmo = self GetWeaponAmmoClip(self.nade);
 	self.specAmmo = self GetWeaponAmmoClip(self.spec);
@@ -207,6 +210,9 @@ revivePlayer( deadPlayer )
 	deadPlayer givePreviousLoadout();
 	if(groundweapon != "" && deadPlayer GetWeaponAmmoStock(groundweapon) <= 0){
 		deadPlayer GiveStartAmmo(groundweapon); // avoid no ammo on secondary bug
+	}
+	if(deadPlayer GetWeaponAmmoStock(secondary) <= 0 ) {
+		deadPlayer GiveStartAmmo(secondary); // avoid no ammo on secondary bug
 	}
 
 	level notify("player_revived");
