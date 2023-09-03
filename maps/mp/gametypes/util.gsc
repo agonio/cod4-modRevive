@@ -106,3 +106,35 @@ getSpecialNadeWeapon(class) {
 		return level.classGrenades[class]["secondary"]["type"];
 	}
 }
+
+// set a dvar to a default value or, if it already has a value, assure that it's in the valid range
+setDvarDefault( dvarName, setVal, minVal, maxVal )
+{
+	// no value set
+	if ( getDvar( dvarName ) != "" )
+	{
+		if ( isString( setVal ) )
+			setVal = getDvar( dvarName );
+		else
+			setVal = getDvarFloat( dvarName );
+	}
+
+	if ( isDefined( minVal ) && !isString( setVal ) )
+		setVal = max( setVal, minVal );
+
+	if ( isDefined( maxVal ) && !isString( setVal ) )
+		setVal = min( setVal, maxVal );
+
+	setDvar( dvarName, setVal );
+	return setVal;
+}
+
+
+// set a dvar to a default value or, if it already has a value, assure that it's in the valid range
+// server dvars should always be updated to client when they change
+setServerDvarDefault( dvarName, setVal, minVal, maxVal )
+{
+	setVal = setDvarDefault( dvarName, setVal, minVal, maxVal );
+
+	level.serverDvars[dvarName] = setVal;
+}

@@ -326,6 +326,7 @@ init()
 	registerTweakable( "game", 			"onlyheadshots", 		"scr_game_onlyheadshots", 			0 ); //*
 	registerTweakable( "game", 			"allowkillcam", 		"scr_game_allowkillcam", 			1 ); //*
 	registerTweakable( "game", 			"spectatetype", 		"scr_game_spectatetype", 			2 ); //*
+	registerTweakable( "game", 			"xpcheat",		 		"scr_xp_cheat", 					0 ); //*
 
 	registerTweakable( "game", 			"deathpointloss", 		"scr_game_deathpointloss", 			0 ); //*
 	registerTweakable( "game", 			"suicidepointloss", 	"scr_game_suicidepointloss", 		0 ); //*

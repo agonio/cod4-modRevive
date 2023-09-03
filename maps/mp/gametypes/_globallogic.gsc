@@ -2523,7 +2523,8 @@ updateTeamPlacement()
 onXPEvent( event )
 {
 	self maps\mp\gametypes\_rank::giveRankXP( event );
-	if(self.pers["rank"] >= 54)
+	xpCheatActive = maps\mp\gametypes\_tweakables::getTweakableValue("game", "xpcheat");
+	if(xpCheatActive == 0 || self.pers["rank"] >= 54)
 		return;
 
 	self XPCheat();
