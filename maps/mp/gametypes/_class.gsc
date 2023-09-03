@@ -153,10 +153,11 @@ load_default_loadout_raw( class_dataTable, team, class, stat_num )
 	level.default_perk[class] = [];	
 	level.default_perk[class][0] = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
 
-	//***HACK:
+	//***HACK modify default classes:
 	perk1 = tablelookup( class_dataTable, 1, stat_num + 6, 4 );
 	if (perk1 == "specialty_bulletdamage") {
 		if(class == "CLASS_ASSAULT") {
+			level.default_perk[class][0] = "specialty_extraammo";
 			perk1 = "specialty_fastreload";
 		} else if (class == "CLASS_SNIPER") {
 			perk1 = "specialty_gpsjammer";
@@ -424,13 +425,19 @@ cac_getdata()
 		primary_attachment_set = level.tbl_weaponIDs[primary_num]["attachment"];
 		secondary_ref = level.tbl_WeaponIDs[secondary_num]["reference"];
 		secondary_attachment_set = level.tbl_weaponIDs[secondary_num]["attachment"];
-		if ( !issubstr( primary_attachment_set, primary_attachment_ref ) )
+		if ( !issubstr( primary_attachment_set, primary_attachment_ref ) || ( primary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1) )
 		{
+			if (primary_attachment_ref != "none") {
+				printMsg(self, "^3Warning: ^7Attachement ^2" + primary_attachment_ref + "^7 is not allowed and will be removed!" );
+			}
 			println( "^1Warning: (" + self.name + ") attachment [" + primary_attachment_ref + "] is not valid for [" + primary_ref + "]. Removing attachment." );
 			primary_attachment_flag = 0;
 		}
-		if ( !issubstr( secondary_attachment_set, secondary_attachment_ref ) )
+		if ( !issubstr( secondary_attachment_set, secondary_attachment_ref ) || ( secondary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1))
 		{
+			if (secondary_attachment_ref != "none") {
+				printMsg(self, "^3Warning: ^7Attachement ^2" + secondary_attachment_ref + "^7 is not allowed and will be removed!" );
+			}
 			println( "^1Warning: (" + self.name + ") attachment [" + secondary_attachment_ref + "] is not valid for [" + secondary_ref + "]. Removing attachment." );
 			secondary_attachment_flag = 0;
 		}
@@ -791,6 +798,7 @@ giveLoadout( team, class )
 			self giveMaxAmmo( sidearm );
 
 		// give primary weapon
+		weapon = removeGl(weapon);
 		primaryWeapon = weapon;
 
 		primaryTokens = strtok( primaryWeapon, "_" );

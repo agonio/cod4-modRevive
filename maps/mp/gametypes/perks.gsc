@@ -27,6 +27,7 @@ setup() {
 	setServerDvarDefault( "perk_forbid_specialty_weapon_c4", 0, 0, 1 );
 	setServerDvarDefault( "perk_forbid_specialty_weapon_claymore", 0, 0, 1 );
 	setServerDvarDefault( "perk_forbid_specialty_weapon_rpg", 0, 0, 1 );
+	setServerDvarDefault( "att_forbid_attachement_weapon_gl", 1, 0, 1 );		// default 1 forbid
 }
 
 // default shall always be enabled
