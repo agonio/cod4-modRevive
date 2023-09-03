@@ -68,9 +68,11 @@ init()
 	// based on weaponList array, precache weapons in list
 	for ( index = 0; index < level.weaponList.size; index++ )
 	{
-		if(isSubstr(level.weaponList[index], "m16")) // fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
+		// fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
+		if(isSubstr(level.weaponList[index], "m16"))
             continue;
-		if(isSubstr(level.weaponList[index], "m4")) // fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp"
+		// fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp"
+		if(isSubstr(level.weaponList[index], "m4_")) // leave out the m40a3 sniper
             continue;
 
 		precacheItem( level.weaponList[index] );
