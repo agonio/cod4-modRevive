@@ -3882,7 +3882,7 @@ Callback_StartGameType()
 
 	level.inPrematchPeriod = true;
 
-	level.gracePeriod = 15;
+	level.gracePeriod = 5;
 
 	level.inGracePeriod = true;
 
@@ -4820,7 +4820,7 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 		obituary(self, attacker, sWeapon, sMeansOfDeath);
 
 //	self maps\mp\gametypes\_weapons::updateWeaponUsageStats();
-	if ( !level.inGracePeriod )
+	if ( !level.inGracePeriod || (isdefined(self.hasDoneCombat) && self.hasDoneCombat) )
 	{
 		self maps\mp\gametypes\_weapons::dropWeaponForDeath( attacker );
 		self maps\mp\gametypes\_weapons::dropOffhand();
