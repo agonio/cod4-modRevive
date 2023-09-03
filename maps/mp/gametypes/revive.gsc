@@ -50,11 +50,12 @@ watchRevives() {
 	}
 }
 
-checkRevive(attacker, sMeansOfDeath)
+onPlayerKilled(attacker, sMeansOfDeath)
 {
 	wait ( 0.05 );
 
 	self saveOldLoadout();
+	self.nearbyTeammates = 0;
 
 	printAliveCount();
 
@@ -118,6 +119,7 @@ monitorBody(trigger, resObjective) {
 		trigger waittill("trigger", player);
 		if ( player.pers["team"] == self.pers["team"] && !player.checkingBody ) {
 			player.checkingBody = true;
+			self.nearbyTeammates++;
 
 			if (isdefined(self.droppedDeathItem)) {
 				self.droppedDeathItem triggerOff();
@@ -179,7 +181,8 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 
 	// Body is not there or the player is not touching the trigger anymore
 	self.checkingBody = false;
-	if (isdefined(deadPlayer.droppedDeathItem)) {
+	deadPlayer.nearbyTeammates--;
+	if (isdefined(deadPlayer.droppedDeathItem) && deadPlayer.nearbyTeammates == 0) {
 		deadPlayer.droppedDeathItem triggerOn();
 	}
 }

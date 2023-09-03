@@ -337,7 +337,7 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 	thread checkAllowSpectating();
 
 	// **** custom code below *****
-	self thread maps\mp\gametypes\revive::checkRevive(attacker, sMeansOfDeath);
+	self thread maps\mp\gametypes\revive::onPlayerKilled(attacker, sMeansOfDeath);
 
 	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
 }
