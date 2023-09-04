@@ -1,13 +1,9 @@
 menufile,ui_mp/main.menu
+menufile,ui_mp/hud.menu
 menufile,ui_mp/challenges.menu
 menufile,ui_mp/createserver.menu
 menufile,ui_mp/pc_joinchoosegamemode.menu
-menufile,ui_mp/settings_quick_war.menu
 menufile,ui_mp/settings_quick_sd.menu
-menufile,ui_mp/settings_quick_dm.menu
-menufile,ui_mp/settings_quick_dom.menu
-menufile,ui_mp/settings_quick_koth.menu
-menufile,ui_mp/settings_quick_sab.menu
 menufile,ui/playerprofile.menu
 
 rawfile,maps/mp/gametypes/_dBots.gsc
@@ -27,7 +23,10 @@ rawfile,maps/mp/gametypes/sab.gsc
 rawfile,maps/mp/gametypes/sd.gsc
 rawfile,maps/mp/gametypes/war.gsc
 
+weapon,mp/revive_mp
 image,logo_cod2
 image,revive_icon
+image,revive_icon_kf
 material,revive_icon
+material,revive_icon_kf
 sound,tacotruck,,all_mp

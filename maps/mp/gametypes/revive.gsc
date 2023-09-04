@@ -11,7 +11,10 @@ setup()
 		// reserve the first 6 (sd)
 		level.usedReviveObjIds[i] = i<6;
 	}
+
+	precacheShader("revive_icon_kf");
 	precacheShader("revive_icon");
+	precacheItem("revive_mp");
 
 	thread watchRevives();
 	thread watchPrematch();
@@ -52,6 +55,7 @@ watchRevives() {
 
 onPlayerKilled(attacker, sMeansOfDeath)
 {
+	setDvar("hide_revived", 0);
 	wait ( 0.05 );
 
 	self saveOldLoadout();
@@ -168,7 +172,7 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 
 		if (barData.curProgress >= barData.useTime) {
 			wait (0.05);
-			revivePlayer(deadPlayer);
+			revivePlayer(deadPlayer, self);
 			trigger delete();
 			if (isdefined(resObjective.id) && resObjective.id != -1) {
 				markObjIdUnused(resObjective.id);
@@ -187,8 +191,16 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 	}
 }
 
-revivePlayer( deadPlayer )
+redrawCenterMessageDelay() {
+	wait 10;
+	setDvar("hide_revived", 0);
+}
+
+revivePlayer( deadPlayer, medic )
 {
+	setDvar("hide_revived", 1);
+	obituary(deadPlayer, medic, "revive_mp", "MOD_GRENADE"); //display revive killfeed message
+	thread redrawCenterMessageDelay();
 	deadPlayer maps\mp\gametypes\_globallogic::_spawnPlayer(deadPlayer.deathClass);
 	deadPlayer.reviveCount++;
 	deadPlayer.health = 10;
