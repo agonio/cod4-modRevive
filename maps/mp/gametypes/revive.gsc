@@ -154,12 +154,12 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 	text setText("hold 'USE' to revive ^2"+ deadPlayer.name);
 
 	// Stay here as long as the body exists and the player is touching it
-	while ( isDefined( self ) && isDefined( deadPlayer.body ) && self isTouching( trigger ) ) {
+	while ( isDefined( self ) && isDefined( deadPlayer.body ) && isDefined( trigger ) && self isTouching( trigger ) ) {
 		wait (0.05);
 		text.alpha = 1;
 		barData.curProgress = 0;
 		// track use button pressed
-		while (self isTouching( trigger ) && self useButtonPressed() && barData.curProgress < barData.useTime) {
+		while (isDefined( trigger ) && self isTouching( trigger ) && self useButtonPressed() && barData.curProgress < barData.useTime) {
 			text.alpha = 0;
 			barData.inUse = true;
 			self thread personalUseBar(barData);
