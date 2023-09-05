@@ -55,7 +55,6 @@ watchRevives() {
 
 onPlayerKilled(attacker, sMeansOfDeath)
 {
-	setDvar("hide_revived", 0);
 	wait ( 0.05 );
 
 	self saveOldLoadout();
@@ -191,16 +190,10 @@ checkIfReviving( deadPlayer, trigger, resObjective )
 	}
 }
 
-redrawCenterMessageDelay() {
-	wait 10;
-	setDvar("hide_revived", 0);
-}
-
 revivePlayer( deadPlayer, medic )
 {
-	setDvar("hide_revived", 1);
 	obituary(deadPlayer, medic, "revive_mp", "MOD_GRENADE"); //display revive killfeed message
-	thread redrawCenterMessageDelay();
+
 	deadPlayer maps\mp\gametypes\_globallogic::_spawnPlayer(deadPlayer.deathClass);
 	deadPlayer.reviveCount++;
 	deadPlayer.health = 10;
