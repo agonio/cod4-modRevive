@@ -8,6 +8,7 @@ menufile,ui/playerprofile.menu
 
 rawfile,maps/mp/gametypes/_dBots.gsc
 rawfile,maps/mp/gametypes/_class.gsc
+rawfile,maps/mp/gametypes/_hud_message.gsc
 rawfile,maps/mp/gametypes/perks.gsc
 rawfile,maps/mp/gametypes/util.gsc
 rawfile,maps/mp/gametypes/_finalkillcam.gsc
