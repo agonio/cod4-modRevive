@@ -4818,6 +4818,7 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 		obituary(self, self, sWeapon, sMeansOfDeath);
 	else
 		obituary(self, attacker, sWeapon, sMeansOfDeath);
+		maps\mp\gametypes\_hud_message::obituaryShow(self, attacker, level.teamBased && self.team == attacker.team);
 
 //	self maps\mp\gametypes\_weapons::updateWeaponUsageStats();
 	if ( !level.inGracePeriod || (isdefined(self.hasDoneCombat) && self.hasDoneCombat) )
