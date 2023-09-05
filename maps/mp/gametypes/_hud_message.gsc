@@ -34,6 +34,7 @@ onPlayerConnect()
 		player thread lowerMessageThink();
 		
 		player thread initNotifyMessage();
+		player thread initObituaryMessage();
 	}
 }
 
@@ -742,4 +743,49 @@ updateOutcome( firstTitle, secondTitle, thirdTitle )
 		else if ( isDefined( thirdTitle ) )
 			thirdTitle.alpha = 0;
 	}	
+}
+
+initObituaryMessage() {
+	textSize = 1.55;
+	font = "default";
+	point = "BOTTOM";
+	yOffset = -90;
+	xOffset = 0;
+
+	self.obituaryText = createFontString( font, textSize );
+	self.obituaryText setPoint( point, undefined, xOffset, yOffset );
+	self.obituaryText.glowAlpha = 0;
+	self.obituaryText.hideWhenInMenu = true;
+	self.obituaryText.archived = false;
+	self.obituaryText.alpha = 0;
+}
+
+obituaryShow(victim, attacker, isTeamkill) {
+	if(victim == attacker) {
+		return;
+	}
+
+	victim notify("obituary_show");
+	attacker notify("obituary_show");
+
+	if(isTeamkill) {
+		victim.obituaryText setText("You were killed by ^1TEAM-MEMBER ^2" + attacker.name);
+		attacker.obituaryText setText("You killed ^1TEAM-MEMBER ^2" + victim.name);
+	} else {
+		victim.obituaryText setText("You were killed by ^1" + attacker.name);
+		attacker.obituaryText setText("You killed ^1" + victim.name);
+	}
+
+	victim.obituaryText.alpha = 1;
+	attacker.obituaryText.alpha = 1;
+
+	victim thread obituaryFade();
+	attacker thread obituaryFade();
+}
+
+obituaryFade() {
+	self endon("obituary_show"); // new obituaryShow event before thread completed; avoid early fade of new message
+	wait 4;
+	self.obituaryText fadeOverTime( 1.0 );
+	self.obituaryText.alpha = 0;
 }
