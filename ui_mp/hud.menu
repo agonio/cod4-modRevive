@@ -1237,7 +1237,7 @@
 			textscale		TEXTSIZE_DEFAULT
 			textstyle		ITEM_TEXTSTYLE_SHADOWED
 			ownerdraw		CG_CENTER_MESSAGE
-			visible			when( dvarInt( hide_revived ) == 0 );
+			visible			0
 			decoration
 		}
 	}
