@@ -1,5 +1,6 @@
-# cod4-modRevive
-is a mod for `search&destroy` adding a revive mechanic. It has the following features:
+![ModRevive Banner](/assets/banner.jpg)
+
+This is a mod for `search&destroy` adding a revive mechanic. It has the following features:
 
 - nearby players can revive team-mates after they've been killed
 - display the current amount of players per team alive, when..
