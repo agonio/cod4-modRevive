@@ -86,7 +86,7 @@ playerHealthRegen()
 		return;
 	}
 	
-	maxhealth = self.health;
+	maxhealth = maps\mp\gametypes\util::getMaxHealth();
 	oldhealth = maxhealth;
 	player = self;
 	health_add = 0;

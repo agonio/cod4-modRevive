@@ -196,7 +196,7 @@ revivePlayer( deadPlayer, medic )
 
 	deadPlayer maps\mp\gametypes\_globallogic::_spawnPlayer(deadPlayer.deathClass);
 	deadPlayer.reviveCount++;
-	deadPlayer.health = 10;
+	deadPlayer.health = 20;
 	deadPlayer SetOrigin(deadPlayer.body.origin);
 	deadPlayer SetPlayerAngles(deadPlayer.angles);
 
@@ -233,7 +233,6 @@ revivePlayer( deadPlayer, medic )
 	} else {
 		deadPlayer SwitchToWeapon(deadPlayer getSecondaryWeapon(deadPlayer.deathClass));
 	}
-	deadPlayer.health = getMaxHealth();
 	deadPlayer playLocalSound( "tacotruck" );
 }
 
@@ -254,17 +253,4 @@ printAliveCount()
 {
 	printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
 	printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
-}
-
-
-getMaxHealth()
-{
-	if ( level.hardcoreMode )
-		return 30;
-	else if ( level.oldschool )
-		return 200;
-	else {
-		healthTweak = maps\mp\gametypes\_tweakables::getTweakableValue("player", "maxhealth");
-		return healthTweak;
-	}
 }

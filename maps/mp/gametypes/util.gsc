@@ -138,3 +138,15 @@ setServerDvarDefault( dvarName, setVal, minVal, maxVal )
 
 	level.serverDvars[dvarName] = setVal;
 }
+
+getMaxHealth()
+{
+	if ( level.hardcoreMode )
+		return 30;
+	else if ( level.oldschool )
+		return 200;
+	else {
+		healthTweak = maps\mp\gametypes\_tweakables::getTweakableValue("player", "maxhealth");
+		return healthTweak;
+	}
+}
