@@ -71,8 +71,8 @@ init()
 		// fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
 		if(isSubstr(level.weaponList[index], "m16"))
             continue;
-		// fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp"
-		if(isSubstr(level.weaponList[index], "m4_")) // leave out the m40a3 sniper
+		// fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp" & "dragunov_acog_mpm40a3_acog_mp"
+		if(isSubstr(level.weaponList[index], "m4"))
             continue;
 
 		precacheItem( level.weaponList[index] );
@@ -91,6 +91,10 @@ init()
 		precacheItem( brokenweapons[index] + "_gl_mp" );
 		precacheItem( brokenweapons[index] + "_acog_mp" );
 	}
+
+	//m40a3
+	precacheItem( "m40a3_mp" );
+	precacheItem( "m40a3_acog_mp" );
 
 
 	precacheItem( "frag_grenade_short_mp" );
