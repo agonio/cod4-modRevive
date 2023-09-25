@@ -354,162 +354,169 @@ cac_getdata()
 	
 	for( i = 0; i < 5; i ++ )
 	{
-		//assertex( self getstat ( i*10+200 ) == 1, "Custom class not initialized!" );
-		
-		// do not change the allocation and assignment of 0-299 stat bytes, or data will be misinterpreted by this function!
-		primary_num = self getstat ( 200+(i*10)+1 );				// returns weapon number (also the unlock stat number from data table)
-		primary_attachment_flag = self getstat ( 200+(i*10)+2 ); 	// returns attachment number (from data table)
-		if ( !isDefined( level.tbl_WeaponAttachment[primary_attachment_flag] ) ) // handle bad attachment stat
-			primary_attachment_flag = 0;
-		primary_attachment_mask = level.tbl_WeaponAttachment[primary_attachment_flag]["bitmask"];
-		secondary_num = self getstat ( 200+(i*10)+3 );				// returns weapon number (also the unlock stat number from data table)
-		secondary_attachment_flag = self getstat ( 200+(i*10)+4 ); 	// returns attachment number (from data table)
-		if ( !isDefined( level.tbl_WeaponAttachment[secondary_attachment_flag] ) ) // handle bad attachment stat
-			secondary_attachment_flag = 0;
-		secondary_attachment_mask = level.tbl_WeaponAttachment[secondary_attachment_flag]["bitmask"];
-		specialty1 = self getstat ( 200+(i*10)+5 ); 				// returns specialty number (from data table)
-		specialty2 = self getstat ( 200+(i*10)+6 ); 				// returns specialty number (from data table)
-		specialty3 = self getstat ( 200+(i*10)+7 ); 				// returns specialty number (from data table)
-		special_grenade = self getstat ( 200+(i*10)+8 );			// returns special grenade type as single special grenade items (from data table)
-		camo_num = self getstat ( 200+(i*10)+9 );					// returns camo number (from data table)
-		
-		if ( camo_num < 0 || camo_num >= level.tbl_CamoSkin.size )
+		self cac_getSingleData(i);
+	}
+}
+
+cac_getSingleData(classIndex) {
+
+	i = classIndex;
+	//assertex( self getstat ( i*10+200 ) == 1, "Custom class not initialized!" );
+
+	// do not change the allocation and assignment of 0-299 stat bytes, or data will be misinterpreted by this function!
+	primary_num = self getstat ( 200+(i*10)+1 );				// returns weapon number (also the unlock stat number from data table)
+	primary_attachment_flag = self getstat ( 200+(i*10)+2 ); 	// returns attachment number (from data table)
+	if ( !isDefined( level.tbl_WeaponAttachment[primary_attachment_flag] ) ) // handle bad attachment stat
+		primary_attachment_flag = 0;
+	primary_attachment_mask = level.tbl_WeaponAttachment[primary_attachment_flag]["bitmask"];
+	secondary_num = self getstat ( 200+(i*10)+3 );				// returns weapon number (also the unlock stat number from data table)
+	secondary_attachment_flag = self getstat ( 200+(i*10)+4 ); 	// returns attachment number (from data table)
+	if ( !isDefined( level.tbl_WeaponAttachment[secondary_attachment_flag] ) ) // handle bad attachment stat
+		secondary_attachment_flag = 0;
+	secondary_attachment_mask = level.tbl_WeaponAttachment[secondary_attachment_flag]["bitmask"];
+	specialty1 = self getstat ( 200+(i*10)+5 ); 				// returns specialty number (from data table)
+	specialty2 = self getstat ( 200+(i*10)+6 ); 				// returns specialty number (from data table)
+	specialty3 = self getstat ( 200+(i*10)+7 ); 				// returns specialty number (from data table)
+	special_grenade = self getstat ( 200+(i*10)+8 );			// returns special grenade type as single special grenade items (from data table)
+	camo_num = self getstat ( 200+(i*10)+9 );					// returns camo number (from data table)
+
+	if ( camo_num < 0 || camo_num >= level.tbl_CamoSkin.size )
+	{
+		println( "^1Warning: (" + self.name + ") camo " + camo_num + " is invalid. Setting to none." );
+		camo_num = 0;
+	}
+
+	camo_mask = level.tbl_CamoSkin[camo_num]["bitmask"];
+
+	m16WeaponIndex = 25;
+	assert( level.tbl_weaponIDs[m16WeaponIndex]["reference"] == "m16" );
+	if ( primary_num < 0 || !isDefined( level.tbl_weaponIDs[ primary_num ] ) )
+	{
+		primary_num = m16WeaponIndex;
+		primary_attachment_flag = 0;
+	}
+	if ( secondary_num < 0 || !isDefined( level.tbl_weaponIDs[ secondary_num ] ) )
+	{
+		secondary_num = 0;
+		secondary_attachment_flag = 0;
+	}
+
+	specialty1 = validatePerk( specialty1, 0 );
+	specialty2 = validatePerk( specialty2, 1 );
+	specialty3 = validatePerk( specialty3, 2 );
+
+	// if specialty2 is not Overkill, disallow anything besides pistols for secondary weapon
+	if ( level.tbl_PerkData[specialty2]["reference_full"] != "specialty_twoprimaries" )
+	{
+		if ( level.tbl_weaponIDs[secondary_num]["group"] != "weapon_pistol" )
 		{
-			println( "^1Warning: (" + self.name + ") camo " + camo_num + " is invalid. Setting to none." );
-			camo_num = 0;
-		}
-		
-		camo_mask = level.tbl_CamoSkin[camo_num]["bitmask"];
-		
-		m16WeaponIndex = 25;
-		assert( level.tbl_weaponIDs[m16WeaponIndex]["reference"] == "m16" );
-		if ( primary_num < 0 || !isDefined( level.tbl_weaponIDs[ primary_num ] ) )
-		{
-			primary_num = m16WeaponIndex;
-			primary_attachment_flag = 0;
-		}
-		if ( secondary_num < 0 || !isDefined( level.tbl_weaponIDs[ secondary_num ] ) )
-		{
+			println( "^1Warning: (" + self.name + ") secondary weapon is not a pistol but perk 2 is not Overkill. Setting secondary weapon to pistol." );
 			secondary_num = 0;
 			secondary_attachment_flag = 0;
 		}
-		
-		specialty1 = validatePerk( specialty1, 0 );
-		specialty2 = validatePerk( specialty2, 1 );
-		specialty3 = validatePerk( specialty3, 2 );
-		
-		// if specialty2 is not Overkill, disallow anything besides pistols for secondary weapon
-		if ( level.tbl_PerkData[specialty2]["reference_full"] != "specialty_twoprimaries" )
-		{
-			if ( level.tbl_weaponIDs[secondary_num]["group"] != "weapon_pistol" )
-			{
-				println( "^1Warning: (" + self.name + ") secondary weapon is not a pistol but perk 2 is not Overkill. Setting secondary weapon to pistol." );
-				secondary_num = 0;
-				secondary_attachment_flag = 0;
-			}
-		}
-		// if certain attachments are used, make sure specialty1 is set right
-		primary_attachment_ref = level.tbl_WeaponAttachment[primary_attachment_flag]["reference"];
-		secondary_attachment_ref = level.tbl_WeaponAttachment[secondary_attachment_flag]["reference"];
-		if ( primary_attachment_ref == "grip" || primary_attachment_ref == "gl" || secondary_attachment_ref == "grip" || secondary_attachment_ref == "gl" )
-		{
-			if ( specialty1 != 190 && specialty1 != 191 && specialty1 != 192 && specialty1 != 193 )
-			{
-				println( "^1Warning: (" + self.name + ") grip or grenade launcher is used but perk 1 was index " + specialty1 + ". Setting perk 1 to none." );
-				specialty1 = 193; // 193 = there's an attachment, so no perk
-			}
-		}
-		
-		// validate weapon attachments, if faulty attachement found, reset to no attachments
-		primary_ref = level.tbl_WeaponIDs[primary_num]["reference"];
-		primary_attachment_set = level.tbl_weaponIDs[primary_num]["attachment"];
-		secondary_ref = level.tbl_WeaponIDs[secondary_num]["reference"];
-		secondary_attachment_set = level.tbl_weaponIDs[secondary_num]["attachment"];
-		if ( !issubstr( primary_attachment_set, primary_attachment_ref ) || ( primary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1) )
-		{
-			if (primary_attachment_ref != "none") {
-				printMsg(self, "^3Warning: ^7Attachement ^2" + primary_attachment_ref + "^7 is not allowed and will be removed!" );
-			}
-			println( "^1Warning: (" + self.name + ") attachment [" + primary_attachment_ref + "] is not valid for [" + primary_ref + "]. Removing attachment." );
-			primary_attachment_flag = 0;
-		}
-		if ( !issubstr( secondary_attachment_set, secondary_attachment_ref ) || ( secondary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1))
-		{
-			if (secondary_attachment_ref != "none") {
-				printMsg(self, "^3Warning: ^7Attachement ^2" + secondary_attachment_ref + "^7 is not allowed and will be removed!" );
-			}
-			println( "^1Warning: (" + self.name + ") attachment [" + secondary_attachment_ref + "] is not valid for [" + secondary_ref + "]. Removing attachment." );
-			secondary_attachment_flag = 0;
-		}
-		
-		// validate special grenade type
-		flashGrenadeIndex = 101;
-		assert( level.tbl_weaponIDs[flashGrenadeIndex]["reference"] == "flash_grenade" ); // if this fails we need to change flashGrenadeIndex
-		if ( !isDefined( level.tbl_weaponIDs[special_grenade] ) )
-			special_grenade = flashGrenadeIndex;
-		specialGrenadeType = level.tbl_weaponIDs[special_grenade]["reference"];
-		if ( specialGrenadeType != "flash_grenade" && specialGrenadeType != "smoke_grenade" && specialGrenadeType != "concussion_grenade" )
-		{
-			println( "^1Warning: (" + self.name + ") special grenade " + special_grenade + " is invalid. Setting to flash grenade." );
-			special_grenade = flashGrenadeIndex;
-		}
-		
-		if ( specialGrenadeType == "smoke_grenade" && level.tbl_PerkData[specialty1]["reference_full"] == "specialty_specialgrenade" )
-		{
-			println( "^1Warning: (" + self.name + ") smoke grenade may not be used with extra special grenades. Setting to flash grenade." );
-			special_grenade = flashGrenadeIndex;
-		}
-		
-		// apply attachment to primary weapon, getting weapon reference strings
-		attachment_string = level.tbl_WeaponAttachment[primary_attachment_flag]["reference"];
-		if( primary_attachment_flag != 0 && attachment_string != "" )
-			self.custom_class[i]["primary"] = level.tbl_weaponIDs[primary_num]["reference"]+"_"+attachment_string+"_mp";
-		else
-			self.custom_class[i]["primary"] = level.tbl_weaponIDs[primary_num]["reference"]+"_mp";
-		
-		// apply attachment to secondary weapon, getting weapon reference strings
-		attachment_string = level.tbl_WeaponAttachment[secondary_attachment_flag]["reference"];
-		if( secondary_attachment_flag != 0 && attachment_string != "" )
-			self.custom_class[i]["secondary"] = level.tbl_weaponIDs[secondary_num]["reference"]+"_"+attachment_string+"_mp"; 
-		else
-			self.custom_class[i]["secondary"] = level.tbl_weaponIDs[secondary_num]["reference"]+"_mp";
-		
-		// obtaining specialties, getting specialty reference strings
-		assertex( isdefined( level.tbl_PerkData[specialty1] ), "Specialty #:"+specialty1+"'s data is undefined" );
-		self.custom_class[i]["specialty1"] = level.tbl_PerkData[specialty1]["reference_full"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_cimage );
-		self.custom_class[i]["specialty1_weaponref"] = level.tbl_PerkData[specialty1]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_creference );
-		self.custom_class[i]["specialty1_count"] = level.tbl_PerkData[specialty1]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_ccount ) );
-		self.custom_class[i]["specialty1_group"] = level.tbl_PerkData[specialty1]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_cgroup );
-		
-		self.custom_class[i]["specialty2"] = level.tbl_PerkData[specialty2]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_creference );
-		self.custom_class[i]["specialty2_weaponref"] = self.custom_class[i]["specialty2"];
-		self.custom_class[i]["specialty2_count"] = level.tbl_PerkData[specialty2]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_ccount ) );
-		self.custom_class[i]["specialty2_group"] = level.tbl_PerkData[specialty2]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_cgroup );
-		
-		self.custom_class[i]["specialty3"] = level.tbl_PerkData[specialty3]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_creference );
-		self.custom_class[i]["specialty3_weaponref"] = self.custom_class[i]["specialty3"];
-		self.custom_class[i]["specialty3_count"] = level.tbl_PerkData[specialty3]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_ccount ) );
-		self.custom_class[i]["specialty3_group"] = level.tbl_PerkData[specialty3]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_cgroup );
-		
-		// builds the full special grenade reference string
-		self.custom_class[i]["special_grenade"] = level.tbl_weaponIDs[special_grenade]["reference"]+"_mp"; //tablelookup( "mp/statstable.csv", level.cac_numbering, special_grenade, level.cac_creference ) + "_mp";
-		self.custom_class[i]["special_grenade_count"] = level.tbl_weaponIDs[special_grenade]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_numbering, special_grenade, level.cac_ccount ) );
-		
-		// camo selection, default 0 = no camo skin
-		self.custom_class[i]["camo_num"] = camo_num;
-		self.cac_initialized = true;
-		
-		/* debug
-		println( "\n ========== CLASS DEBUG INFO ========== \n" );
-		println( "Primary: "+self.custom_class[i]["primary"] );
-		println( "Secondary: "+self.custom_class[i]["secondary"] );
-		println( "Specialty1: "+self.custom_class[i]["specialty1"]+" - Group: "+self.custom_class[i]["specialty1_group"]+" - Count: "+self.custom_class[i]["specialty1_count"] );
-		println( "Specialty2: "+self.custom_class[i]["specialty2"] );
-		println( "Specialty3: "+self.custom_class[i]["specialty3"] );
-		println( "Special Grenade: "+self.custom_class[i]["special_grenade"]+" - Count: "+self.custom_class[i]["special_grenade_count"] );
-		println( "Primary Camo: "+attachmenttablelookup( level.cac_cname, level.cac_cint2, camo_num ) );
-		*/
 	}
+	// if certain attachments are used, make sure specialty1 is set right
+	primary_attachment_ref = level.tbl_WeaponAttachment[primary_attachment_flag]["reference"];
+	secondary_attachment_ref = level.tbl_WeaponAttachment[secondary_attachment_flag]["reference"];
+	if ( primary_attachment_ref == "grip" || primary_attachment_ref == "gl" || secondary_attachment_ref == "grip" || secondary_attachment_ref == "gl" )
+	{
+		if ( specialty1 != 190 && specialty1 != 191 && specialty1 != 192 && specialty1 != 193 )
+		{
+			println( "^1Warning: (" + self.name + ") grip or grenade launcher is used but perk 1 was index " + specialty1 + ". Setting perk 1 to none." );
+			specialty1 = 193; // 193 = there's an attachment, so no perk
+		}
+	}
+
+	// validate weapon attachments, if faulty attachement found, reset to no attachments
+	primary_ref = level.tbl_WeaponIDs[primary_num]["reference"];
+	primary_attachment_set = level.tbl_weaponIDs[primary_num]["attachment"];
+	secondary_ref = level.tbl_WeaponIDs[secondary_num]["reference"];
+	secondary_attachment_set = level.tbl_weaponIDs[secondary_num]["attachment"];
+	if ( !issubstr( primary_attachment_set, primary_attachment_ref ) || ( primary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1) )
+	{
+		if (primary_attachment_ref != "none") {
+			printMsg(self, "^3Warning: ^7Attachement ^2" + primary_attachment_ref + "^7 is not allowed and will be removed!" );
+		}
+		println( "^1Warning: (" + self.name + ") attachment [" + primary_attachment_ref + "] is not valid for [" + primary_ref + "]. Removing attachment." );
+		primary_attachment_flag = 0;
+	}
+	if ( !issubstr( secondary_attachment_set, secondary_attachment_ref ) || ( secondary_attachment_ref == "gl" && getDvarFloat("att_forbid_attachement_weapon_gl") == 1))
+	{
+		if (secondary_attachment_ref != "none") {
+			printMsg(self, "^3Warning: ^7Attachement ^2" + secondary_attachment_ref + "^7 is not allowed and will be removed!" );
+		}
+		println( "^1Warning: (" + self.name + ") attachment [" + secondary_attachment_ref + "] is not valid for [" + secondary_ref + "]. Removing attachment." );
+		secondary_attachment_flag = 0;
+	}
+
+	// validate special grenade type
+	flashGrenadeIndex = 101;
+	assert( level.tbl_weaponIDs[flashGrenadeIndex]["reference"] == "flash_grenade" ); // if this fails we need to change flashGrenadeIndex
+	if ( !isDefined( level.tbl_weaponIDs[special_grenade] ) )
+		special_grenade = flashGrenadeIndex;
+	specialGrenadeType = level.tbl_weaponIDs[special_grenade]["reference"];
+	if ( specialGrenadeType != "flash_grenade" && specialGrenadeType != "smoke_grenade" && specialGrenadeType != "concussion_grenade" )
+	{
+		println( "^1Warning: (" + self.name + ") special grenade " + special_grenade + " is invalid. Setting to flash grenade." );
+		special_grenade = flashGrenadeIndex;
+	}
+
+	if ( specialGrenadeType == "smoke_grenade" && level.tbl_PerkData[specialty1]["reference_full"] == "specialty_specialgrenade" )
+	{
+		println( "^1Warning: (" + self.name + ") smoke grenade may not be used with extra special grenades. Setting to flash grenade." );
+		special_grenade = flashGrenadeIndex;
+	}
+
+	// apply attachment to primary weapon, getting weapon reference strings
+	attachment_string = level.tbl_WeaponAttachment[primary_attachment_flag]["reference"];
+	if( primary_attachment_flag != 0 && attachment_string != "" )
+		self.custom_class[i]["primary"] = level.tbl_weaponIDs[primary_num]["reference"]+"_"+attachment_string+"_mp";
+
+	else
+		self.custom_class[i]["primary"] = level.tbl_weaponIDs[primary_num]["reference"]+"_mp";
+
+	// apply attachment to secondary weapon, getting weapon reference strings
+	attachment_string = level.tbl_WeaponAttachment[secondary_attachment_flag]["reference"];
+	if( secondary_attachment_flag != 0 && attachment_string != "" )
+		self.custom_class[i]["secondary"] = level.tbl_weaponIDs[secondary_num]["reference"]+"_"+attachment_string+"_mp";
+	else
+		self.custom_class[i]["secondary"] = level.tbl_weaponIDs[secondary_num]["reference"]+"_mp";
+
+	// obtaining specialties, getting specialty reference strings
+	assertex( isdefined( level.tbl_PerkData[specialty1] ), "Specialty #:"+specialty1+"'s data is undefined" );
+	self.custom_class[i]["specialty1"] = level.tbl_PerkData[specialty1]["reference_full"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_cimage );
+	self.custom_class[i]["specialty1_weaponref"] = level.tbl_PerkData[specialty1]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_creference );
+	self.custom_class[i]["specialty1_count"] = level.tbl_PerkData[specialty1]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_ccount ) );
+	self.custom_class[i]["specialty1_group"] = level.tbl_PerkData[specialty1]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty1, level.cac_cgroup );
+
+	self.custom_class[i]["specialty2"] = level.tbl_PerkData[specialty2]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_creference );
+	self.custom_class[i]["specialty2_weaponref"] = self.custom_class[i]["specialty2"];
+	self.custom_class[i]["specialty2_count"] = level.tbl_PerkData[specialty2]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_ccount ) );
+	self.custom_class[i]["specialty2_group"] = level.tbl_PerkData[specialty2]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty2, level.cac_cgroup );
+
+	self.custom_class[i]["specialty3"] = level.tbl_PerkData[specialty3]["reference"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_creference );
+	self.custom_class[i]["specialty3_weaponref"] = self.custom_class[i]["specialty3"];
+	self.custom_class[i]["specialty3_count"] = level.tbl_PerkData[specialty3]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_ccount ) );
+	self.custom_class[i]["specialty3_group"] = level.tbl_PerkData[specialty3]["group"]; //tablelookup( "mp/statstable.csv", level.cac_cstat, specialty3, level.cac_cgroup );
+
+	// builds the full special grenade reference string
+	self.custom_class[i]["special_grenade"] = level.tbl_weaponIDs[special_grenade]["reference"]+"_mp"; //tablelookup( "mp/statstable.csv", level.cac_numbering, special_grenade, level.cac_creference ) + "_mp";
+	self.custom_class[i]["special_grenade_count"] = level.tbl_weaponIDs[special_grenade]["count"]; //int( tablelookup( "mp/statstable.csv", level.cac_numbering, special_grenade, level.cac_ccount ) );
+
+	// camo selection, default 0 = no camo skin
+	self.custom_class[i]["camo_num"] = camo_num;
+	self.cac_initialized = true;
+
+	/* debug
+	println( "\n ========== CLASS DEBUG INFO ========== \n" );
+	println( "Primary: "+self.custom_class[i]["primary"] );
+	println( "Secondary: "+self.custom_class[i]["secondary"] );
+	println( "Specialty1: "+self.custom_class[i]["specialty1"]+" - Group: "+self.custom_class[i]["specialty1_group"]+" - Count: "+self.custom_class[i]["specialty1_count"] );
+	println( "Specialty2: "+self.custom_class[i]["specialty2"] );
+	println( "Specialty3: "+self.custom_class[i]["specialty3"] );
+	println( "Special Grenade: "+self.custom_class[i]["special_grenade"]+" - Count: "+self.custom_class[i]["special_grenade_count"] );
+	println( "Primary Camo: "+attachmenttablelookup( level.cac_cname, level.cac_cint2, camo_num ) );
+	*/
 }
 
 validatePerk( perkIndex, perkSlotIndex )
@@ -674,6 +681,9 @@ giveLoadout( team, class )
 		// obtains the custom class number
 		class_num = int( class[class.size-1] )-1;
 		self.class_num = class_num;
+
+		//reload stat data for given class, as it could be changed during the game
+		self cac_getSingleData(class_num);
 		
 		assertex( isdefined( self.custom_class[class_num]["primary"] ), "Custom class "+class_num+": primary weapon setting missing" );
 		assertex( isdefined( self.custom_class[class_num]["secondary"] ), "Custom class "+class_num+": secondary weapon setting missing" );
