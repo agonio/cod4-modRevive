@@ -113,8 +113,13 @@ onMenuResponse()
 				self openMenu( "changeclass_offline" );
 		}
 		*/
-		printMsg(self, "menuresponse: "+ menu+ " | " +  response);
-			
+		//printMsg(self, "menuresponse: "+ menu+ " | " +  response);
+
+		if ( response == "cac_back" )
+		{
+			printMsg(self, "Changes to custom classes will take effect in the next match.");
+		}
+
 		if ( response == "back" )
 		{
 			self closeMenu();
@@ -280,7 +285,7 @@ onMenuResponse()
 		}
 		
 		// ======== catching response for create-a-class events ========
-
+		/*
 		responseTok = strTok( response, "," );
 		
 		if( isdefined( responseTok ) && responseTok.size > 1 )
@@ -335,10 +340,12 @@ onMenuResponse()
 				self setstat( stat_offset+209, int( tableLookup( "mp/attachmentTable.csv", 4, responseTok[2], 11 ) ) );					
 			}
 		}
+		*/
 	}
 }
 
 // sort response message from CAC menu
+/*
 cacMenuStatOffset( menu, response )
 {
 	stat_offset = -1;
@@ -358,3 +365,4 @@ cacMenuStatOffset( menu, response )
 	
 	return stat_offset;
 }
+*/
