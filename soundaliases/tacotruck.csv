@@ -1,3 +1,3 @@
 name,sequence,file,vol_min,vol_max,vol_mod,pitch_min,pitch_max,dist_min,dist_max,channel,type,probability,loop,masterslave,loadspec,subtitle,compression,secondaryaliasname,volumefalloffcurve,startdelay,speakermap,reverb,lfe percentage,center percentage,platform,envelop_min,envelop_max,envelop percentage,conversion
 
-tacotruck,,tacotruck.mp3,0.75,,music,,,,,music,streamed,,,,,,,,,,music,nowetlevel fulldrylevel,,,!PC
+revive,,revive.mp3,0.2,0.8,na,,,,750,auto,streamed,,,,,,,,weapon2,,,nowetlevel fulldrylevel,,,!PC
