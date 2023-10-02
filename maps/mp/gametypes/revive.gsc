@@ -233,7 +233,11 @@ revivePlayer( deadPlayer, medic )
 	} else {
 		deadPlayer SwitchToWeapon(deadPlayer getSecondaryWeapon(deadPlayer.deathClass));
 	}
-	deadPlayer playLocalSound( "tacotruck" );
+
+	soundEnabled = maps\mp\gametypes\_tweakables::getTweakableValue("game", "revivesound");
+	if(soundEnabled == 1) {
+		deadPlayer playSound( "revive" );
+	}
 }
 
 givePreviousLoadout() {

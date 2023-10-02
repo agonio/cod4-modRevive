@@ -650,7 +650,10 @@ startFK( winner )
 		player notify("beginFK", winner);
 	}
 
-	slowMotion();
+	slowmoEnabled = maps\mp\gametypes\_tweakables::getTweakableValue("game", "fkc_slowmo");
+	if(slowmoEnabled == 1) {
+		slowMotion();
+	}
 
 }
 
