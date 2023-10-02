@@ -68,34 +68,15 @@ init()
 	// based on weaponList array, precache weapons in list
 	for ( index = 0; index < level.weaponList.size; index++ )
 	{
-		// fix for broken weapon on killhouse "m16_reflex_mpm16_silencer_mp"
-		if(isSubstr(level.weaponList[index], "m16"))
+		// fix for broken weapons e.g. "m16_reflex_mpm16_silencer_mp"
+		if(strtok(level.weaponList[index], "_").size > 3) {
+			println( "Ignored weapon: " + level.weaponList[index] );
             continue;
-		// fix for broken weapon on downpour "m4_reflex_mpm4_acog_mp" & "dragunov_acog_mpm40a3_acog_mp"
-		if(isSubstr(level.weaponList[index], "m4"))
-            continue;
+		}
 
 		precacheItem( level.weaponList[index] );
 		println( "Precached weapon: " + level.weaponList[index] );
 	}
-
-	brokenweapons = [];
-	brokenweapons[0] = "m16";
-	brokenweapons[1] = "m4";
-
-	for ( index = 0; index < brokenweapons.size; index++ )
-	{
-		precacheItem( brokenweapons[index] + "_mp" );
-		precacheItem( brokenweapons[index] + "_reflex_mp" );
-		precacheItem( brokenweapons[index] + "_silencer_mp" );
-		precacheItem( brokenweapons[index] + "_gl_mp" );
-		precacheItem( brokenweapons[index] + "_acog_mp" );
-	}
-
-	//m40a3
-	precacheItem( "m40a3_mp" );
-	precacheItem( "m40a3_acog_mp" );
-
 
 	precacheItem( "frag_grenade_short_mp" );
 

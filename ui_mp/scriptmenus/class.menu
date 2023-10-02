@@ -8,7 +8,7 @@
 #define CHOICE_Y_START			204 //180
 
 #define CHOICE_GROUP			"class"
-#define CHOICE_SEP_1			1
+#define CHOICE_SEP_1			4
 #define CHOICE_SEP_2			5
 
 #include "ui_mp/menustyle.inc"
@@ -141,22 +141,23 @@
 		#undef	CHOICE_HORIZONTAL_ALIGN
 		#define CHOICE_HORIZONTAL_ALIGN HORIZONTAL_ALIGN_CENTER
 
-		CHOICE_BUTTON_FOCUS_VIS_ADV( 1, "@MPUI_CREATE_A_CLASS", SETUP_ACTION_CREATEACLASS, exec "set ui_hint_text @MPUI_DESC_CREATE_A_CLASS", CLEARUIHINT, when( !localvarBool( ui_hideBack ) && stat( 260 ) >= 1 ), !localvarBool( ui_hideBack ) && stat( 260 ) >= 1 )
-		CHOICE_BUTTON_FOCUS_VIS_NOHI( 1, "", ;, exec "set ui_hint_text @MPUI_DESC_CREATE_A_CLASS_LOCKED", CLEARUIHINT, when(!localvarBool( ui_hideBack ) && stat( 260 ) < 1 ) )
-		CHOICE_DBUTTON_VIS( 1, "@MPUI_CREATE_A_CLASS", when( !localvarBool( ui_hideBack ) && stat( 260 ) < 1 ) )
+		CHOICE_BUTTON_BG( 1, when( (TEAM_IS_MARINES || TEAM_IS_OPFOR) && MAY_CHOOSE_CLASS ) )
+		CHOICE_HIGHLIGHT( 1, (TEAM_IS_MARINES || TEAM_IS_OPFOR) && MAY_CHOOSE_CLASS )
+		CHOICE_BUTTON_VIS_NOHI( 1, "@MPUI_CHOOSE_CLASS", scriptMenuResponse "changeclass_marines", when( TEAM_IS_MARINES && MAY_CHOOSE_CLASS ) )
+		CHOICE_BUTTON_VIS_NOHI( 1, "@MPUI_CHOOSE_CLASS", scriptMenuResponse "changeclass_opfor", when( TEAM_IS_OPFOR && MAY_CHOOSE_CLASS ) )
+		CHOICE_DBUTTON_VIS( 1, "@MPUI_CHOOSE_CLASS", when( dvarInt( scr_oldschool ) == 1 ); )
+
+		CHOICE_BUTTON( 2, "@MPUI_CHANGE_TEAM", scriptMenuResponse "changeteam"; )
+
+		CHOICE_BUTTON( 3, "@MENU_CONTROLS", close self; open main_controls )
+		CHOICE_BUTTON( 4, "@MENU_OPTIONS", close self; open main_options; execnow "set ui_allow_graphic_change 0"; )
 
 		CHOICE_SEPARATOR( CHOICE_SEP_1 )
 
-		CHOICE_BUTTON_BG( 2, when( (TEAM_IS_MARINES || TEAM_IS_OPFOR) && MAY_CHOOSE_CLASS ) )
-		CHOICE_HIGHLIGHT( 2, (TEAM_IS_MARINES || TEAM_IS_OPFOR) && MAY_CHOOSE_CLASS )
-		CHOICE_BUTTON_VIS_NOHI( 2, "@MPUI_CHOOSE_CLASS", scriptMenuResponse "changeclass_marines", when( TEAM_IS_MARINES && MAY_CHOOSE_CLASS ) )
-		CHOICE_BUTTON_VIS_NOHI( 2, "@MPUI_CHOOSE_CLASS", scriptMenuResponse "changeclass_opfor", when( TEAM_IS_OPFOR && MAY_CHOOSE_CLASS ) )
-		CHOICE_DBUTTON_VIS( 2, "@MPUI_CHOOSE_CLASS", when( dvarInt( scr_oldschool ) == 1 ); )
-		
-		CHOICE_BUTTON( 3, "@MPUI_CHANGE_TEAM", scriptMenuResponse "changeteam"; )
+		CHOICE_BUTTON_FOCUS_VIS_ADV( 5, "@MPUI_CREATE_A_CLASS", SETUP_ACTION_CREATEACLASS, exec "set ui_hint_text @MPUI_DESC_CREATE_A_CLASS", CLEARUIHINT, when( !localvarBool( ui_hideBack ) && stat( 260 ) >= 1 ), !localvarBool( ui_hideBack ) && stat( 260 ) >= 1 )
+		CHOICE_BUTTON_FOCUS_VIS_NOHI( 5, "", ;, exec "set ui_hint_text @MPUI_DESC_CREATE_A_CLASS_LOCKED", CLEARUIHINT, when(!localvarBool( ui_hideBack ) && stat( 260 ) < 1 ) )
+		CHOICE_DBUTTON_VIS( 5, "@MPUI_CREATE_A_CLASS", when( !localvarBool( ui_hideBack ) && stat( 260 ) < 1 ) )
 
-		CHOICE_BUTTON( 4, "@MENU_CONTROLS", close self; open main_controls )
-		CHOICE_BUTTON( 5, "@MENU_OPTIONS", close self; open main_options; execnow "set ui_allow_graphic_change 0"; )
 		
 		CHOICE_SEPARATOR( CHOICE_SEP_2 )
 
