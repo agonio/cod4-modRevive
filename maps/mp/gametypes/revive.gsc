@@ -6,6 +6,7 @@
 
 setup()
 {
+	level.lockPrint = false;
 	level.usedReviveObjIds = [];
 	for (i=0; i<16; i++) {
 		// reserve the first 6 (sd)
@@ -255,6 +256,12 @@ setPreviousAmmo(weapon, ammo) {
 
 printAliveCount()
 {
-	printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
-	printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
+	if(!level.lockPrint) {
+		level.lockPrint = true;
+		printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
+		printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
+
+		wait ( 0.05 );
+		level.lockPrint = false;
+	}
 }
