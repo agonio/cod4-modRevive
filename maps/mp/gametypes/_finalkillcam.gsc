@@ -38,19 +38,23 @@ beginFK()
 
 		if(level.TeamBased)
 		{
-			self finalkillcam(level.KillInfo[winner]["attacker"], level.KillInfo[winner]["attackerNumber"], level.KillInfo[winner]["deathTime"], level.KillInfo[winner]["victim"]);
+			self finalkillcam(level.KillInfo[winner]["attackerName"], level.KillInfo[winner]["attackerNumber"], level.KillInfo[winner]["deathTime"], level.KillInfo[winner]["victimName"]);
 		}
 		else
 		{
-			self finalkillcam(winner.KillInfo["attacker"], winner.KillInfo["attackerNumber"], winner.KillInfo["deathTime"], winner.KillInfo["victim"]);
+			self finalkillcam(winner.KillInfo["attackerName"], winner.KillInfo["attackerNumber"], winner.KillInfo["deathTime"], winner.KillInfo["victimName"]);
 		}
 	}
 }
 
-finalkillcam( attacker, attackerNum, deathtime, victim)
+finalkillcam( attackerName, attackerNum, deathtime, victimName)
 {
 	self endon("disconnect");
 	level endon("end_killcam");
+
+	// early launch cleanup thread
+	self thread WaitLevelEnd();
+	self thread CleanFK();
 
 	self SetClientDvar("ui_ShowMenuOnly", "none");
 
@@ -85,7 +89,7 @@ finalkillcam( attacker, attackerNum, deathtime, victim)
 
 	if(!isDefined(self.top_fk_shader))
 	{
-		self CreateFKMenu(victim , attacker);
+		self CreateFKMenu(victimName , attackerName);
 	}
 	else
 	{
@@ -93,7 +97,7 @@ finalkillcam( attacker, attackerNum, deathtime, victim)
 		self.fk_title_low.alpha = 1;
 		self.top_fk_shader.alpha = 0.5;
 		self.bottom_fk_shader.alpha = 0.5;
-		self.credits.alpha = 0.2;
+		self.credits.alpha = 0.35;
 	}
 
 	self thread WaitEnd(killcamlength);
@@ -101,8 +105,6 @@ finalkillcam( attacker, attackerNum, deathtime, victim)
 	wait 0.05;
 
 	self waittill("end_killcam");
-
-	self thread CleanFK();
 
 	self.killcamentity = -1;
 	self.archivetime = 0;
@@ -130,6 +132,8 @@ finalkillcam( attacker, attackerNum, deathtime, victim)
 
 CleanFK()
 {
+	self waittill("clean_fk");
+
 	self.fk_title.alpha = 0;
 	self.fk_title_low.alpha = 0;
 	self.top_fk_shader.alpha = 0;
@@ -141,6 +145,15 @@ CleanFK()
 	visionSetNaked( "mpOutro", 1.0 );
 }
 
+WaitLevelEnd()
+{
+	self endon("disconnect");
+
+	level waittill("end_killcam");
+
+	self notify("clean_fk");
+}
+
 WaitEnd( killcamlength )
 {
 	self endon("disconnect");
@@ -148,10 +161,11 @@ WaitEnd( killcamlength )
 
 	wait killcamlength;
 
+	self notify("clean_fk");
 	self notify("end_killcam");
 }
 
-CreateFKMenu( victim , attacker)
+CreateFKMenu( victimName , attackerName)
 {
 	self.top_fk_shader = newClientHudElem(self);
 	self.top_fk_shader.elemType = "shader";
@@ -161,22 +175,22 @@ CreateFKMenu( victim , attacker)
 	self.top_fk_shader.sort = 0;
 	self.top_fk_shader.foreground = true;
 	self.top_fk_shader.color	= (.15, .15, .15);
-	self.top_fk_shader setShader("white",640,112);
+	self.top_fk_shader setShader("white",640,80);
 
 	self.bottom_fk_shader = newClientHudElem(self);
 	self.bottom_fk_shader.elemType = "shader";
-	self.bottom_fk_shader.y = 368;
+	self.bottom_fk_shader.y = 400;
 	self.bottom_fk_shader.archived = false;
 	self.bottom_fk_shader.horzAlign = "fullscreen";
 	self.bottom_fk_shader.vertAlign = "fullscreen";
 	self.bottom_fk_shader.sort = 0;
 	self.bottom_fk_shader.foreground = true;
 	self.bottom_fk_shader.color	= (.15, .15, .15);
-	self.bottom_fk_shader setShader("white",640,112);
+	self.bottom_fk_shader setShader("white",640,80);
 
 	self.fk_title = newClientHudElem(self);
 	self.fk_title.archived = false;
-	self.fk_title.y = 45;
+	self.fk_title.y = 40;
 	self.fk_title.alignX = "center";
 	self.fk_title.alignY = "middle";
 	self.fk_title.horzAlign = "center";
@@ -190,14 +204,14 @@ CreateFKMenu( victim , attacker)
 	self.fk_title_low = newClientHudElem(self);
 	self.fk_title_low.archived = false;
 	self.fk_title_low.x = 0;
-	self.fk_title_low.y = -85;
+	self.fk_title_low.y = -35;
 	self.fk_title_low.alignX = "center";
 	self.fk_title_low.alignY = "bottom";
 	self.fk_title_low.horzAlign = "center_safearea";
 	self.fk_title_low.vertAlign = "bottom";
 	self.fk_title_low.sort = 1; // force to draw after the bars
 	self.fk_title_low.font = "objective";
-	self.fk_title_low.fontscale = 1.4;
+	self.fk_title_low.fontscale = 1.6;
 	self.fk_title_low.foreground = true;
 
 	self.credits = newClientHudElem(self);
@@ -217,10 +231,10 @@ CreateFKMenu( victim , attacker)
 	self.fk_title_low.alpha = 1;
 	self.top_fk_shader.alpha = 0.5;
 	self.bottom_fk_shader.alpha = 0.5;
-	self.credits.alpha = 0.2;
+	self.credits.alpha = 0.35;
 
-	self.credits setText("^1Created by: ^2FzBr.^3d4rk");
-	self.fk_title_low setText(attacker.name + " killed " + victim.name);
+	self.credits setText("^7Created by: ^2FzBr.^3d4rk ^7| modified by: ^0agonio");
+	self.fk_title_low setText(victimName + " was killed by " + attackerName);
 
 	if( !level.killcam_style )
 		self.fk_title setText("GAME WINNING KILL");
@@ -240,16 +254,16 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 
 		if(level.teamBased)
 		{
-			level.KillInfo[team]["attacker"] = attacker;
+			level.KillInfo[team]["attackerName"] = attacker.name;
 			level.KillInfo[team]["attackerNumber"] = attacker getEntityNumber();
-			level.KillInfo[team]["victim"] = self;
+			level.KillInfo[team]["victimName"] = self.name;
 			level.KillInfo[team]["deathTime"] = GetTime()/1000;
 		}
 		else
 		{
-			attacker.KillInfo["attacker"] = attacker;
+			attacker.KillInfo["attackerName"] = attacker.name;
 			attacker.KillInfo["attackerNumber"] = attacker getEntityNumber();
-			attacker.KillInfo["victim"] = self;
+			attacker.KillInfo["victimName"] = self.name;
 			attacker.KillInfo["deathTime"] = GetTime()/1000;
 		}
 	}
