@@ -6,7 +6,6 @@
 
 setup()
 {
-	level.lockPrint = false;
 	level.usedReviveObjIds = [];
 	for (i=0; i<16; i++) {
 		// reserve the first 6 (sd)
@@ -18,7 +17,6 @@ setup()
 	precacheItem("revive_mp");
 
 	thread watchRevives();
-	thread watchPrematch();
 }
 
 getNextFreeObjId()
@@ -38,19 +36,12 @@ markObjIdUnused(id)
 	objective_delete(id);
 }
 
-watchPrematch() {
-	level endon("game_ended");
-	for(;;) {
-		level waittill("prematch_over");
-		printAliveCount();
-	}
-}
 
 watchRevives() {
 	level endon("game_ended");
 	for(;;) {
 		level waittill("player_revived");
-		printAliveCount();
+		maps\mp\gametypes\teamCounter::printAliveCount();
 	}
 }
 
@@ -60,8 +51,6 @@ onPlayerKilled(attacker, sMeansOfDeath)
 
 	self saveOldLoadout();
 	self.nearbyTeammates = 0;
-
-	printAliveCount();
 
 	// wait for body's final position
 	wait(1.5);
@@ -251,17 +240,5 @@ givePreviousLoadout() {
 setPreviousAmmo(weapon, ammo) {
 	if(weapon != "") {
 		self maps\mp\gametypes\_class::setWeaponAmmoOverall( weapon, ammo );
-	}
-}
-
-printAliveCount()
-{
-	if(!level.lockPrint) {
-		level.lockPrint = true;
-		printTeam("^2"+level.aliveCount["axis"]+ " ^7vs ^1" + level.aliveCount["allies"], "axis");
-		printTeam("^2"+level.aliveCount["allies"]+ " ^7vs ^1" + level.aliveCount["axis"], "allies");
-
-		wait ( 0.05 );
-		level.lockPrint = false;
 	}
 }

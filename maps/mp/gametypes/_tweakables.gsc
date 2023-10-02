@@ -329,6 +329,7 @@ init()
 	registerTweakable( "game", 			"xpcheat",		 		"scr_xp_cheat", 					0 ); //*
 	registerTweakable( "game", 			"revivesound",		 	"scr_revivesound", 					1 ); //*
 	registerTweakable( "game", 			"fkc_slowmo",		 	"scr_fkc_slowmo", 					1 ); //*
+	registerTweakable( "game", 			"allowrevive",		 	"scr_game_allowrevive",				1 ); //*
 
 	registerTweakable( "game", 			"deathpointloss", 		"scr_game_deathpointloss", 			0 ); //*
 	registerTweakable( "game", 			"suicidepointloss", 	"scr_game_suicidepointloss", 		0 ); //*

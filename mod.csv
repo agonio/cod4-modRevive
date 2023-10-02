@@ -23,6 +23,7 @@ rawfile,maps/mp/gametypes/_weapons.gsc
 rawfile,maps/mp/gametypes/dm.gsc
 rawfile,maps/mp/gametypes/dom.gsc
 rawfile,maps/mp/gametypes/revive.gsc
+rawfile,maps/mp/gametypes/teamCounter.gsc
 rawfile,maps/mp/gametypes/sab.gsc
 rawfile,maps/mp/gametypes/sd.gsc
 rawfile,maps/mp/gametypes/war.gsc

@@ -98,7 +98,11 @@ main()
 	maps\mp\gametypes\_globallogic::registerRoundLimitDvar( level.gameType, 0, 0, 12 );
 	maps\mp\gametypes\_globallogic::registerNumLivesDvar( level.gameType, 1, 0, 10 );
 
-	maps\mp\gametypes\revive::setup();
+	allowrevive = maps\mp\gametypes\_tweakables::getTweakableValue("game", "allowrevive");
+	if(allowrevive == 1) {
+		maps\mp\gametypes\revive::setup();
+	}
+	maps\mp\gametypes\teamCounter::setup();
 
 	level.teamBased = true;
 	level.overrideTeamScore = true;
@@ -336,8 +340,12 @@ onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHit
 {
 	thread checkAllowSpectating();
 
-	// **** custom code below *****
-	self thread maps\mp\gametypes\revive::onPlayerKilled(attacker, sMeansOfDeath);
+	allowrevive = maps\mp\gametypes\_tweakables::getTweakableValue("game", "allowrevive");
+	if(allowrevive == 1) {
+		self thread maps\mp\gametypes\revive::onPlayerKilled(attacker, sMeansOfDeath);
+	}
+
+	thread maps\mp\gametypes\teamCounter::onPlayerKilled(attacker, sMeansOfDeath);
 
 	thread maps\mp\gametypes\_finalkillcam::onPlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration);
 }
