@@ -1,6 +1,7 @@
 ![ModRevive Banner](/assets/banner.jpg)
+<p align="center" style="text-align: center; margin-top: -20px; font-size: 16px">v1.2.0</p>
 
-This is a mod for `search&destroy` adding a revive mechanic. It has the following features:
+ModRevive is a mod for `search&destroy` adding a revive mechanic. It has the following features - some of which also apply to other gamemodes:
 
 - nearby players can revive team-mates after they've been killed
 - display the current amount of players per team alive, when..
@@ -8,6 +9,7 @@ This is a mod for `search&destroy` adding a revive mechanic. It has the followin
   - a player was killed,
   - a player was revived.
 - manage the available perks via DVARs - `perk_forbid_specialty_<perkname> 1`
+- change the custom classes during the match (effective in next match/map, due to client/server restrictions)
 - integrated the [Final Killcam](https://www.moddb.com/mods/final-killcam) mod created by [FzBr.d4rk](https://www.moddb.com/members/fzbrd4rk) ©
 
 ## Usage
@@ -20,6 +22,9 @@ There are several DVARs to customize the ModRevive experience:
 - `scr_player_revivetime`: basic revive time; default: 3000 (ms)
 - `scr_player_revivetimeincrease`: additional time per prior successful revive; default: 1000 (ms)
 - `scr_game_roundstarttime`: time in seconds to wait before each round; default: 5 (s)
+- `scr_revivesound`: to allow the new sound to be played (1) or not (0); default: 1
+- `scr_fkc_slowmo`: to show the finalKillcam with (1) or without (0) slow motion (prevent network lags for high pings); default: 1
+- `scr_game_allowrevive`: to toggle the revive mechanic on (1) or off (0); default: 1
 
 
 ## Development
