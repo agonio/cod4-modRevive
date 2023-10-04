@@ -4,6 +4,7 @@ del mod.ff
 xcopy ui_mp ..\..\raw\ui_mp /SY
 xcopy ui ..\..\raw\ui /SY
 xcopy maps ..\..\raw\maps /SY
+xcopy mp ..\..\raw\mp /SY
 xcopy soundaliases ..\..\raw\soundaliases /SY
 xcopy sound ..\..\raw\sound /SY
 xcopy materials ..\..\raw\materials /SY

@@ -152,20 +152,7 @@ load_default_loadout_raw( class_dataTable, team, class, stat_num )
 	// give default class perks
 	level.default_perk[class] = [];	
 	level.default_perk[class][0] = tablelookup( class_dataTable, 1, stat_num + 5, 4 );
-
-	//***HACK modify default classes:
-	perk1 = tablelookup( class_dataTable, 1, stat_num + 6, 4 );
-	if (perk1 == "specialty_bulletdamage") {
-		if(class == "CLASS_ASSAULT") {
-			level.default_perk[class][0] = "specialty_extraammo";
-			perk1 = "specialty_fastreload";
-		} else if (class == "CLASS_SNIPER") {
-			perk1 = "specialty_gpsjammer";
-		}
-	}
-	level.default_perk[class][1] = perk1;
-	//***HACK_END
-
+	level.default_perk[class][1] = tablelookup( class_dataTable, 1, stat_num + 6, 4 );
 	level.default_perk[class][2] = tablelookup( class_dataTable, 1, stat_num + 7, 4 );
 	
 	// give all inventory
@@ -808,7 +795,6 @@ giveLoadout( team, class )
 			self giveMaxAmmo( sidearm );
 
 		// give primary weapon
-		weapon = removeGl(weapon);
 		primaryWeapon = weapon;
 
 		primaryTokens = strtok( primaryWeapon, "_" );
