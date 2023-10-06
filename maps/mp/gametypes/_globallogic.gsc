@@ -4005,8 +4005,15 @@ Callback_PlayerConnect()
 		self thread listenForGameEnd();
 
 	// only print that we connected if we haven't connected in a previous round
-	if( !level.splitscreen && !isdefined( self.pers["score"] ) )
+	if( !level.splitscreen && !isdefined( self.pers["score"] ) ){
+
 		iPrintLn(&"MP_CONNECTED", self);
+		self.cur_kill_streak = 0;
+		self setStat(666, 0);
+	} else {
+		//read kill streak from previous round
+		self.cur_kill_streak = self getStat(666);
+	}
 
 	lpselfnum = self getEntityNumber();
 	lpGuid = self getGuid();
@@ -4091,7 +4098,6 @@ Callback_PlayerConnect()
 	self.leaderDialogGroups = [];
 	self.leaderDialogGroup = "";
 
-	self.cur_kill_streak = 0;
 	self.cur_death_streak = 0;
 	self.death_streak = self maps\mp\gametypes\_persistence::statGet( "death_streak" );
 	self.kill_streak = self maps\mp\gametypes\_persistence::statGet( "kill_streak" );
@@ -4816,9 +4822,12 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	// send out an obituary message to all clients about the kill
 	if( level.teamBased && isDefined( attacker.pers ) && self.team == attacker.team && sMeansOfDeath == "MOD_GRENADE" && level.friendlyfire == 0 )
 		obituary(self, self, sWeapon, sMeansOfDeath);
-	else
+	else {
 		obituary(self, attacker, sWeapon, sMeansOfDeath);
-		maps\mp\gametypes\_hud_message::obituaryShow(self, attacker, level.teamBased && self.team == attacker.team);
+		if (isDefined(attacker) && isPlayer(attacker)) {
+			maps\mp\gametypes\_hud_message::obituaryShow(self, attacker, level.teamBased && self.team == attacker.team);
+		}
+	}
 
 //	self maps\mp\gametypes\_weapons::updateWeaponUsageStats();
 	if ( !level.inGracePeriod || (isdefined(self.hasDoneCombat) && self.hasDoneCombat) )
@@ -4842,16 +4851,13 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 	{
 		// if team killed we reset kill streak, but dont count death and death streak
 		if ( isPlayer( attacker ) && level.teamBased && ( attacker != self ) && ( self.pers["team"] == attacker.pers["team"] ) )
-		{
-			self.cur_kill_streak = 0;
-		}
+		{}
 		else
 		{
 			self incPersStat( "deaths", 1 );
 			self.deaths = self getPersStat( "deaths" );
 			self updatePersRatio( "kdratio", "kills", "deaths" );
 
-			self.cur_kill_streak = 0;
 			self.cur_death_streak++;
 
 			if ( self.cur_death_streak > self.death_streak )
@@ -4860,6 +4866,8 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 				self.death_streak = self.cur_death_streak;
 			}
 		}
+		self.cur_kill_streak = 0;
+		self setStat(666, 0);
 	}
 
 	lpselfnum = self getEntityNumber();
@@ -4993,6 +5001,7 @@ Callback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDi
 				{
 					if ( !isDefined( eInflictor ) || !isDefined( eInflictor.requiredDeathCount ) || attacker.deathCount == eInflictor.requiredDeathCount )
 						attacker.cur_kill_streak++;
+						attacker setStat(666, attacker.cur_kill_streak);
 				}
 
 				if ( isDefined( level.hardpointItems ) && isAlive( attacker ) )
