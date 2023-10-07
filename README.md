@@ -1,5 +1,5 @@
 ![ModRevive Banner](/assets/banner.jpg)
-<p align="center" style="text-align: center; margin-top: -20px; font-size: 16px">v1.2.0</p>
+<p align="center" style="text-align: center; margin-top: -20px; font-size: 16px">v1.2.1</p>
 
 ModRevive is a mod for `search&destroy` adding a revive mechanic. It has the following features - some of which also apply to other gamemodes:
 
