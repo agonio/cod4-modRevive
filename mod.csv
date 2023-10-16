@@ -10,6 +10,7 @@ menufile,ui_mp/scriptmenus/class.menu
 rawfile,maps/mp/gametypes/_dBots.gsc
 rawfile,maps/mp/gametypes/_class.gsc
 rawfile,maps/mp/gametypes/_menus.gsc
+rawfile,maps/mp/gametypes/_hardpoints.gsc
 rawfile,maps/mp/gametypes/_hud_message.gsc
 rawfile,maps/mp/gametypes/_healthoverlay.gsc
 rawfile,maps/mp/gametypes/perks.gsc

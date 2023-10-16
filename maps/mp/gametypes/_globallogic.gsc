@@ -3882,7 +3882,7 @@ Callback_StartGameType()
 
 	level.inPrematchPeriod = true;
 
-	level.gracePeriod = 5;
+	level.gracePeriod = 10;
 
 	level.inGracePeriod = true;
 
